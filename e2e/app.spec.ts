@@ -15,9 +15,9 @@ test.describe('CivilDraw — application smoke', () => {
 
   test('renders the default 5 layers', async ({ page }) => {
     // Default layers: 仮設構造物 / 土工 / 既存構造物 / 寸法 / 注記
-    await expect(page.getByDisplayValue('仮設構造物')).toBeVisible()
-    await expect(page.getByDisplayValue('土工')).toBeVisible()
-    await expect(page.getByDisplayValue('注記')).toBeVisible()
+    await expect(page.locator('input[value="仮設構造物"]')).toBeVisible()
+    await expect(page.locator('input[value="土工"]')).toBeVisible()
+    await expect(page.locator('input[value="注記"]')).toBeVisible()
   })
 
   test('opens the help dialog on button click', async ({ page }) => {
