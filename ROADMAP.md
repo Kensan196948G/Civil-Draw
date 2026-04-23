@@ -41,10 +41,10 @@
 | タスク | 概要 | 優先度 | 状態 |
 |--------|------|--------|------|
 | PERF-001 | 10,000 図形での 60fps 実測・ボトルネック特定 | P1 | 🟡 基盤 Closed / 実測待 (#10) |
-| PERF-002 | 仮想化・レイヤーキャッシュ導入 | P1 | Open |
+| PERF-002 | Konva Layer 分離 / Shape-by-Layer Map グルーピング | P1 | 🟡 PR #20 (#19) |
 | AUTH-001 | Entra ID 認証フロー設計 (MSAL.js) | P1 | 🟡 設計完 / IT 部門待 (#11) |
 | AUTH-002 | トークン検証・セッション管理 | P1 | Open |
-| SEC-001 | CSP ヘッダー・XSS 対策監査 | P1 | 🟡 PR #18 (#17) |
+| SEC-001 | CSP ヘッダー・XSS 対策監査 | P1 | ✅ Merged (#17 / PR #18) |
 | CI-001 | E2E テスト基盤 (Playwright) 導入 | P2 | ✅ Closed (#12) |
 | DXF-001 | SPLINE / ELLIPSE エンティティ読込 | P2 | ✅ Merged (#13 / PR #15) |
 | DXF-002 | HATCH エンティティ読込 (M3 繰越) | P3 | ⏸ #14 (dxf-parser 非対応) |
