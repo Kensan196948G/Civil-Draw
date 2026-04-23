@@ -308,8 +308,9 @@ timeline
     section M2 安定化&認証
         2026-05-23 : 大量図形 60fps 検証
                     : Entra ID 認証統合
-                    : E2E テスト基盤
-                    : DXF SPLINE/ELLIPSE 読込
+                    : E2E テスト基盤 ✅ (#12)
+                    : DXF SPLINE/ELLIPSE 読込 ✅ (#13)
+                    : CSP + XSS 監査 🟡 (#17)
     section M3 機能拡張
         2026-06-23 : テンプレート機能
                     : シンボル 30 種 / ハッチ 10 種
@@ -340,13 +341,14 @@ timeline
 | 指標 | 目標 | 実績 |
 |------|------|------|
 | 🧪 テストカバレッジ | 70%+ | ✅ **86%** |
-| 📝 ユニットテスト数 | — | ✅ **103 passed** |
+| 📝 ユニットテスト数 | — | ✅ **103 passed + SEC-001 新規 13** |
 | 🎭 E2E テスト数 | — | ✅ **8 scenarios (Playwright)** |
 | 🔒 TypeScript strict | エラーゼロ | ✅ |
-| 📦 初期バンドル | < 500KB | ✅ **489KB** (gzip 153KB) |
+| 🛡️ CSP meta | 9 directives | ✅ **index.html に適用** ([docs/SECURITY_AUDIT.md](./docs/SECURITY_AUDIT.md)) |
+| 📦 初期バンドル | < 500KB | ✅ **489KB** (gzip 153KB) + dxf 動的 45KB |
 | ⚡ 60fps 維持 | 10,000図形まで | ✅ React.memo+culling+Konva最適化 実装済 |
-| ✅ CI | All pass | ✅ (10 連続成功) |
-| 🎯 GitHub Issues | Project 同期 | ✅ 9/9 Closed |
+| ✅ CI | All pass | ✅ (13 連続成功 / build-test + e2e-test) |
+| 🎯 GitHub Issues | Project 同期 | ✅ M1 9/9 Closed / M2 進行中 |
 
 ---
 
