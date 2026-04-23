@@ -8,9 +8,11 @@ import type { SnapResult } from '../utils/snapEngine'
 const GRID_UNIT = 1000
 
 export function useSnap() {
-  const zoom = useCanvasStore((s) => s.zoom)
   const scale = useCanvasStore((s) => s.scale)
   const gridSnap = useCanvasStore((s) => s.gridSnap)
+  const snapEndpoint = useCanvasStore((s) => s.snapEndpoint)
+  const snapMidpoint = useCanvasStore((s) => s.snapMidpoint)
+  const snapIntersection = useCanvasStore((s) => s.snapIntersection)
   const shapes = useLayerStore((s) => s.shapes)
 
   const snap = useCallback(
@@ -20,15 +22,10 @@ export function useSnap() {
         cursor,
         [...shapes, ...extraShapes],
         gridSize,
-        {
-          snapGrid: gridSnap,
-          snapEndpoint: true,
-          snapMidpoint: true,
-          snapIntersection: true,
-        },
+        { snapGrid: gridSnap, snapEndpoint, snapMidpoint, snapIntersection },
       )
     },
-    [shapes, gridSnap, scale, zoom],
+    [shapes, gridSnap, snapEndpoint, snapMidpoint, snapIntersection, scale],
   )
 
   return { snap }

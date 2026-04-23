@@ -1,10 +1,11 @@
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { nanoid } from 'nanoid'
 import type { KonvaEventObject } from 'konva/lib/Node'
 import { useToolStore } from '../store/toolStore'
 import { useLayerStore } from '../store/layerStore'
 import { useSnap } from './useSnap'
 import type { Shape, Point } from '../types/geometry'
+import type { SnapResult } from '../utils/snapEngine'
 import {
   findShapeAtPoint,
   findShapesInRect,
@@ -30,6 +31,7 @@ export function useTool(stageToWorld: (x: number, y: number) => Point) {
   const setSelected = useLayerStore((s) => s.setSelected)
 
   const { snap } = useSnap()
+  const [lastSnap, setLastSnap] = useState<SnapResult | null>(null)
 
   const getWorld = useCallback(
     (e: KonvaEventObject<MouseEvent>): Point => {
@@ -42,7 +44,11 @@ export function useTool(stageToWorld: (x: number, y: number) => Point) {
   )
 
   const getSnappedWorld = useCallback(
-    (e: KonvaEventObject<MouseEvent>): Point => snap(getWorld(e)).point,
+    (e: KonvaEventObject<MouseEvent>): Point => {
+      const result = snap(getWorld(e))
+      setLastSnap(result)
+      return result.point
+    },
     [getWorld, snap],
   )
 
@@ -305,6 +311,7 @@ export function useTool(stageToWorld: (x: number, y: number) => Point) {
   return {
     previewShape,
     selectionBox,
+    lastSnap,
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,

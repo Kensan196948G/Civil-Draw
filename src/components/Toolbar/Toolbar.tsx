@@ -4,7 +4,17 @@ import { useLayerStore } from '../../store/layerStore'
 import { HelpDialog } from '../HelpDialog'
 
 export function Toolbar() {
-  const { scale, setScale, paperSize, setPaperSize, paperOrientation, setPaperOrientation, gridVisible, setGridVisible, resetView } = useCanvasStore()
+  const {
+    scale, setScale,
+    paperSize, setPaperSize,
+    paperOrientation, setPaperOrientation,
+    gridVisible, setGridVisible,
+    gridSnap, setGridSnap,
+    snapEndpoint, setSnapEndpoint,
+    snapMidpoint, setSnapMidpoint,
+    snapIntersection, setSnapIntersection,
+    resetView,
+  } = useCanvasStore()
   const { layers, shapes, clearDocument, loadDocument } = useLayerStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const dxfInputRef = useRef<HTMLInputElement>(null)
@@ -117,10 +127,31 @@ export function Toolbar() {
         グリッド
       </label>
 
+      <div className="flex items-center gap-1 border-l border-gray-600 pl-2">
+        <span className="text-gray-400">スナップ:</span>
+        <SnapToggle label="格子" checked={gridSnap} onChange={setGridSnap} />
+        <SnapToggle label="端点" checked={snapEndpoint} onChange={setSnapEndpoint} />
+        <SnapToggle label="中点" checked={snapMidpoint} onChange={setSnapMidpoint} />
+        <SnapToggle label="交点" checked={snapIntersection} onChange={setSnapIntersection} />
+      </div>
+
       <button onClick={resetView} className="px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded">表示リセット</button>
 
       <div className="flex-1" />
       <HelpDialog />
     </div>
+  )
+}
+
+function SnapToggle({ label, checked, onChange }: {
+  label: string
+  checked: boolean
+  onChange: (v: boolean) => void
+}) {
+  return (
+    <label className="flex items-center gap-0.5 cursor-pointer px-1">
+      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="w-3 h-3" />
+      <span className={checked ? 'text-green-300' : 'text-gray-500'}>{label}</span>
+    </label>
   )
 }

@@ -33,6 +33,9 @@ interface CanvasState {
   paperOrientation: PaperOrientation
   gridVisible: boolean
   gridSnap: boolean
+  snapEndpoint: boolean
+  snapMidpoint: boolean
+  snapIntersection: boolean
   cursorX: number
   cursorY: number
   setZoom: (zoom: number) => void
@@ -42,6 +45,9 @@ interface CanvasState {
   setPaperOrientation: (o: PaperOrientation) => void
   setGridVisible: (v: boolean) => void
   setGridSnap: (v: boolean) => void
+  setSnapEndpoint: (v: boolean) => void
+  setSnapMidpoint: (v: boolean) => void
+  setSnapIntersection: (v: boolean) => void
   setCursor: (x: number, y: number) => void
   resetView: () => void
 }
@@ -55,6 +61,9 @@ export const useCanvasStore = create<CanvasState>()((set) => ({
   paperOrientation: 'landscape',
   gridVisible: true,
   gridSnap: true,
+  snapEndpoint: true,
+  snapMidpoint: true,
+  snapIntersection: true,
   cursorX: 0,
   cursorY: 0,
   setZoom: (zoom) => set({ zoom: Math.min(50, Math.max(0.1, zoom)) }),
@@ -64,6 +73,9 @@ export const useCanvasStore = create<CanvasState>()((set) => ({
   setPaperOrientation: (paperOrientation) => set({ paperOrientation }),
   setGridVisible: (gridVisible) => set({ gridVisible }),
   setGridSnap: (gridSnap) => set({ gridSnap }),
+  setSnapEndpoint: (snapEndpoint) => set({ snapEndpoint }),
+  setSnapMidpoint: (snapMidpoint) => set({ snapMidpoint }),
+  setSnapIntersection: (snapIntersection) => set({ snapIntersection }),
   setCursor: (cursorX, cursorY) => set({ cursorX, cursorY }),
   resetView: () => set({ zoom: 1, panX: 0, panY: 0 }),
 }))

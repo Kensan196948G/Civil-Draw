@@ -7,6 +7,7 @@ import { useCanvas } from '../../hooks/useCanvas'
 import { useTool } from '../../hooks/useTool'
 import { renderGrid } from '../../utils/gridRenderer'
 import { ShapeRenderer } from './ShapeRenderer'
+import { SnapMarker } from './SnapMarker'
 import { rectFromPoints } from '../../utils/selection'
 import type Konva from 'konva'
 
@@ -40,6 +41,7 @@ export function CanvasArea() {
   const {
     previewShape,
     selectionBox,
+    lastSnap,
     handleMouseDown,
     handleMouseMove: handleToolMouseMove,
     handleMouseUp: handleToolMouseUp,
@@ -194,6 +196,7 @@ export function CanvasArea() {
               listening={false}
             />
           )}
+          {activeTool !== 'select' && <SnapMarker snap={lastSnap} zoom={zoom} />}
         </Layer>
       </Stage>
     </div>
