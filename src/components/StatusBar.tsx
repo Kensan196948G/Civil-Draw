@@ -17,7 +17,7 @@ export function StatusBar() {
       <span>ズーム: {(zoom * 100).toFixed(0)}%</span>
       <span>スナップ: {gridSnap ? 'ON' : 'OFF'}</span>
       <span>ツール: {activeTool}</span>
-      <span>図形: {shapeCount}</span>
+      <span>図形: {shapeCount}{shapeCount >= 500 ? ' (cull)' : ''}</span>
       {selectedIds.length > 0 && <span>選択: {selectedIds.length}</span>}
       <div className="flex-1" />
       <FPSMeter />

@@ -9,6 +9,7 @@ import { renderGrid } from '../../utils/gridRenderer'
 import { ShapeRenderer } from './ShapeRenderer'
 import { SnapMarker } from './SnapMarker'
 import { rectFromPoints } from '../../utils/selection'
+import { isInViewport, shouldCull } from '../../utils/viewportCulling'
 import type Konva from 'konva'
 
 const GRID_UNIT = 1000
@@ -139,6 +140,12 @@ export function CanvasArea() {
     ? rectFromPoints(selectionBox.start, selectionBox.current)
     : null
 
+  const cullingEnabled = shouldCull(shapes.length)
+  const viewport = { zoom, panX, panY, width: w, height: h }
+  const visibleShapes = cullingEnabled
+    ? shapes.filter((s) => isInViewport(s, viewport))
+    : shapes
+
   return (
     <div
       ref={containerRef}
@@ -161,7 +168,7 @@ export function CanvasArea() {
           {layers
             .filter((l) => l.visible)
             .flatMap((l) =>
-              shapes
+              visibleShapes
                 .filter((s) => s.layerId === l.id)
                 .map((s) => (
                   <ShapeRenderer
