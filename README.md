@@ -310,7 +310,8 @@ timeline
                     : Entra ID 認証統合
                     : E2E テスト基盤 ✅ (#12)
                     : DXF SPLINE/ELLIPSE 読込 ✅ (#13)
-                    : CSP + XSS 監査 🟡 (#17)
+                    : CSP + XSS 監査 ✅ (#17 / PR #18)
+                    : Konva Layer 分離 🟡 (#19 / PR #20)
     section M3 機能拡張
         2026-06-23 : テンプレート機能
                     : シンボル 30 種 / ハッチ 10 種
@@ -346,7 +347,7 @@ timeline
 | 🔒 TypeScript strict | エラーゼロ | ✅ |
 | 🛡️ CSP meta | 9 directives | ✅ **index.html に適用** ([docs/SECURITY_AUDIT.md](./docs/SECURITY_AUDIT.md)) |
 | 📦 初期バンドル | < 500KB | ✅ **489KB** (gzip 153KB) + dxf 動的 45KB |
-| ⚡ 60fps 維持 | 10,000図形まで | ✅ React.memo+culling+Konva最適化 実装済 |
+| ⚡ 60fps 維持 | 10,000図形まで | ✅ React.memo + culling + Konva最適化 + Layer分離 (PERF-002) 実装済 |
 | ✅ CI | All pass | ✅ (13 連続成功 / build-test + e2e-test) |
 | 🎯 GitHub Issues | Project 同期 | ✅ M1 9/9 Closed / M2 進行中 |
 
