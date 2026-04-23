@@ -57,6 +57,15 @@ function getEndpoints(shape: Shape): Point[] {
         { x: shape.x1, y: shape.y1 },
         { x: shape.x2, y: shape.y2 },
       ]
+    case 'hatch': {
+      const pts: Point[] = []
+      for (let i = 0; i < shape.points.length - 1; i += 2) {
+        pts.push({ x: shape.points[i], y: shape.points[i + 1] })
+      }
+      return pts
+    }
+    case 'symbol':
+      return [{ x: shape.x, y: shape.y }]
   }
 }
 

@@ -46,6 +46,7 @@ function shapeTypeName(type: Shape['type']): string {
   const names: Record<Shape['type'], string> = {
     line: '線分', rect: '矩形', circle: '円',
     polyline: 'ポリライン', text: 'テキスト', dimension: '寸法線',
+    hatch: 'ハッチング', symbol: 'シンボル',
   }
   return names[type]
 }

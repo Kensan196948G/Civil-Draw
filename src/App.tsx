@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Toolbar } from './components/Toolbar/Toolbar'
 import { ToolPanel } from './components/ToolPanel/ToolPanel'
+import { ToolOptionsPanel } from './components/ToolPanel/ToolOptionsPanel'
 import { CanvasArea } from './components/Canvas/CanvasArea'
 import { LayerPanel } from './components/LayerPanel/LayerPanel'
 import { PropertyPanel } from './components/PropertyPanel/PropertyPanel'
@@ -33,11 +34,12 @@ export default function App() {
 
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-white overflow-hidden">
-      <Toolbar />
+      <div className="no-print"><Toolbar /></div>
       <div className="flex flex-1 overflow-hidden">
-        <ToolPanel />
+        <div className="no-print"><ToolPanel /></div>
         <CanvasArea />
-        <div className="flex flex-col w-60 border-l border-gray-700 flex-shrink-0">
+        <div className="flex flex-col w-60 border-l border-gray-700 flex-shrink-0 no-print">
+          <ToolOptionsPanel />
           <div className="flex-1 overflow-y-auto">
             <LayerPanel />
           </div>
@@ -46,7 +48,7 @@ export default function App() {
           </div>
         </div>
       </div>
-      <StatusBar />
+      <div className="no-print"><StatusBar /></div>
     </div>
   )
 }

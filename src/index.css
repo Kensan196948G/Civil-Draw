@@ -17,3 +17,10 @@ body {
   height: 100vh;
   width: 100vw;
 }
+
+@media print {
+  @page { size: auto; margin: 5mm; }
+  body { overflow: visible !important; }
+  .no-print { display: none !important; }
+  .print-canvas { width: 100% !important; height: 100vh !important; }
+}

@@ -1,6 +1,8 @@
 import Drawing from 'dxf-writer'
 import type { Shape } from '../types/geometry'
 import type { Layer } from '../types/layer'
+import { generateHatchLines } from './hatchGenerator'
+import { getSymbolById } from './symbolCatalog'
 
 function hexToAci(hex: string): number {
   const r = parseInt(hex.slice(1, 3), 16)
@@ -66,6 +68,45 @@ export function exportDxf(layers: Layer[], shapes: Shape[]): string {
       case 'text':
         d.drawText(shape.x, shape.y, shape.fontSize * 0.001, shape.rotation, shape.text)
         break
+      case 'hatch': {
+        const pts: [number, number][] = []
+        for (let i = 0; i < shape.points.length - 1; i += 2) {
+          pts.push([shape.points[i], shape.points[i + 1]])
+        }
+        d.drawPolyline(pts, true)
+        const lines = generateHatchLines(shape.points, shape.pattern, shape.angle, shape.spacing)
+        for (const l of lines) {
+          d.drawLine(l.x1, l.y1, l.x2, l.y2)
+        }
+        break
+      }
+      case 'symbol': {
+        const sym = getSymbolById(shape.symbolId)
+        if (!sym) break
+        const cos = Math.cos((shape.rotation * Math.PI) / 180)
+        const sin = Math.sin((shape.rotation * Math.PI) / 180)
+        const tx = (px: number, py: number): [number, number] => [
+          shape.x + (px * cos - py * sin) * shape.scale,
+          shape.y + (px * sin + py * cos) * shape.scale,
+        ]
+        for (const path of sym.paths) {
+          if (path.type === 'line') {
+            const [a, b] = tx(path.data[0], path.data[1])
+            const [c, e] = tx(path.data[2], path.data[3])
+            d.drawLine(a, b, c, e)
+          } else if (path.type === 'circle') {
+            const [cx, cy] = tx(path.data[0], path.data[1])
+            d.drawCircle(cx, cy, path.data[2] * shape.scale)
+          } else {
+            const polyPts: [number, number][] = []
+            for (let i = 0; i < path.data.length - 1; i += 2) {
+              polyPts.push(tx(path.data[i], path.data[i + 1]))
+            }
+            d.drawPolyline(polyPts, path.closed ?? false)
+          }
+        }
+        break
+      }
       case 'dimension': {
         const { x1, y1, x2, y2, offset, orientation, textHeight } = shape
         if (orientation === 'horizontal') {

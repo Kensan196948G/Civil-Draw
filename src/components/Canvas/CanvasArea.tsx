@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react'
-import { Stage, Layer } from 'react-konva'
+import { Stage, Layer, Rect } from 'react-konva'
 import { useCanvasStore } from '../../store/canvasStore'
 import { useLayerStore } from '../../store/layerStore'
 import { useToolStore } from '../../store/toolStore'
@@ -7,6 +7,7 @@ import { useCanvas } from '../../hooks/useCanvas'
 import { useTool } from '../../hooks/useTool'
 import { renderGrid } from '../../utils/gridRenderer'
 import { ShapeRenderer } from './ShapeRenderer'
+import { rectFromPoints } from '../../utils/selection'
 import type Konva from 'konva'
 
 const GRID_UNIT = 1000
@@ -23,25 +24,25 @@ export function CanvasArea() {
   const scale = useCanvasStore((s) => s.scale)
   const setPan = useCanvasStore((s) => s.setPan)
 
-  const { layers, shapes, selectedIds, setSelected } = useLayerStore((s) => ({
-    layers: s.layers,
-    shapes: s.shapes,
-    selectedIds: s.selectedIds,
-    setSelected: s.setSelected,
-  }))
+  const layers = useLayerStore((s) => s.layers)
+  const shapes = useLayerStore((s) => s.shapes)
+  const selectedIds = useLayerStore((s) => s.selectedIds)
+  const setSelected = useLayerStore((s) => s.setSelected)
 
   const {
     handleWheel,
     handleMiddleMouseDown,
     handleMouseMove: handleCanvasMouseMove,
-    handleMouseUp,
+    handleMouseUp: handleCanvasMouseUp,
     stageToWorld,
   } = useCanvas()
 
   const {
     previewShape,
+    selectionBox,
     handleMouseDown,
     handleMouseMove: handleToolMouseMove,
+    handleMouseUp: handleToolMouseUp,
     handleDoubleClick,
     handleKeyDown,
   } = useTool(stageToWorld)
@@ -122,27 +123,26 @@ export function CanvasArea() {
   )
 
   const handleStageMouseUp = useCallback(
-    (e: Parameters<typeof handleMouseUp>[0]) => {
+    (e: Parameters<typeof handleCanvasMouseUp>[0]) => {
       isDragging.current = false
-      handleMouseUp(e)
+      handleCanvasMouseUp(e)
+      handleToolMouseUp()
     },
-    [handleMouseUp],
-  )
-
-  const handleStageClick = useCallback(
-    (e: Parameters<typeof handleMouseDown>[0]) => {
-      if (activeTool === 'select' && e.target === e.target.getStage()) {
-        setSelected([])
-      }
-    },
-    [activeTool, setSelected],
+    [handleCanvasMouseUp, handleToolMouseUp],
   )
 
   const { w, h } = getSize()
   const layerById = new Map(layers.map((l) => [l.id, l]))
+  const selectionRect = selectionBox
+    ? rectFromPoints(selectionBox.start, selectionBox.current)
+    : null
 
   return (
-    <div ref={containerRef} className="flex-1 overflow-hidden bg-neutral-100" style={{ cursor: activeTool === 'select' ? 'default' : 'crosshair' }}>
+    <div
+      ref={containerRef}
+      className="flex-1 overflow-hidden bg-neutral-100"
+      style={{ cursor: activeTool === 'select' ? 'default' : 'crosshair' }}
+    >
       <Stage
         ref={stageRef}
         width={w} height={h}
@@ -152,7 +152,6 @@ export function CanvasArea() {
         onMouseDown={handleStageMouseDown}
         onMouseMove={handleStageMouseMove}
         onMouseUp={handleStageMouseUp}
-        onClick={handleStageClick}
         onDblClick={handleDoubleClick}
       >
         <Layer ref={gridLayerRef} />
@@ -180,6 +179,19 @@ export function CanvasArea() {
               isSelected={false}
               onSelect={() => {}}
               isPreview
+            />
+          )}
+          {selectionRect && (
+            <Rect
+              x={selectionRect.minX}
+              y={selectionRect.minY}
+              width={selectionRect.maxX - selectionRect.minX}
+              height={selectionRect.maxY - selectionRect.minY}
+              stroke="#4af"
+              strokeWidth={1 / zoom}
+              dash={[4 / zoom, 4 / zoom]}
+              fill="rgba(68, 170, 255, 0.08)"
+              listening={false}
             />
           )}
         </Layer>

@@ -10,6 +10,8 @@ const TOOLS: { id: ToolType; label: string; icon: string }[] = [
   { id: 'polyline', label: 'ポリライン', icon: '⌐' },
   { id: 'text', label: 'テキスト', icon: 'A' },
   { id: 'dimension', label: '寸法線', icon: '↔' },
+  { id: 'hatch', label: 'ハッチング', icon: '▧' },
+  { id: 'symbol', label: 'シンボル', icon: '★' },
 ]
 
 export function ToolPanel() {

@@ -140,6 +140,13 @@ export const useLayerStore = create<LayerState>()((set, get) => {
             return { ...s, x: s.x + dx, y: s.y + dy }
           case 'dimension':
             return { ...s, x1: s.x1 + dx, y1: s.y1 + dy, x2: s.x2 + dx, y2: s.y2 + dy }
+          case 'hatch':
+            return {
+              ...s,
+              points: s.points.map((v, i) => (i % 2 === 0 ? v + dx : v + dy)),
+            }
+          case 'symbol':
+            return { ...s, x: s.x + dx, y: s.y + dy }
         }
       })
       const h = pushHistory(get().history, get().historyIndex, shapes)

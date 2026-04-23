@@ -40,6 +40,7 @@ export function Toolbar() {
       <button onClick={handleOpen} className="px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded">開く</button>
       <button onClick={handleSave} className="px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded">保存</button>
       <button onClick={handleDxf} className="px-2 py-1 bg-blue-700 hover:bg-blue-600 rounded">DXF出力</button>
+      <button onClick={() => window.print()} className="px-2 py-1 bg-purple-700 hover:bg-purple-600 rounded">PDF出力</button>
       <input ref={fileInputRef} type="file" accept=".civil,.json" className="hidden" onChange={handleFileChange} />
 
       <div className="w-px h-5 bg-gray-600 mx-1" />

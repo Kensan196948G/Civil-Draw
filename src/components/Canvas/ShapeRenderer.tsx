@@ -1,6 +1,8 @@
-import { Line, Rect, Circle, Text, Arrow } from 'react-konva'
+import { Line, Rect, Circle, Text, Arrow, Group } from 'react-konva'
 import type { Shape } from '../../types/geometry'
 import type { Layer } from '../../types/layer'
+import { generateHatchLines } from '../../utils/hatchGenerator'
+import { getSymbolById } from '../../utils/symbolCatalog'
 
 interface Props {
   shape: Shape
@@ -85,6 +87,72 @@ export function ShapeRenderer({ shape, layer, isSelected, onSelect, isPreview = 
           listening={!isPreview}
         />
       )
+    case 'hatch': {
+      const lines = generateHatchLines(shape.points, shape.pattern, shape.angle, shape.spacing)
+      return (
+        <Group onClick={handleClick} listening={!isPreview}>
+          <Line
+            points={shape.points} closed
+            stroke={color} strokeWidth={strokeWidth}
+            fill="transparent"
+            opacity={isPreview ? 0.6 : 1}
+          />
+          {lines.map((l, i) => (
+            <Line
+              key={i}
+              points={[l.x1, l.y1, l.x2, l.y2]}
+              stroke={color} strokeWidth={lineWidth * 0.5}
+              opacity={isPreview ? 0.4 : 0.7}
+              listening={false}
+            />
+          ))}
+        </Group>
+      )
+    }
+    case 'symbol': {
+      const sym = getSymbolById(shape.symbolId)
+      if (!sym) return null
+      return (
+        <Group
+          x={shape.x} y={shape.y}
+          rotation={shape.rotation}
+          scaleX={shape.scale} scaleY={shape.scale}
+          onClick={handleClick}
+          listening={!isPreview}
+          opacity={isPreview ? 0.6 : 1}
+        >
+          {sym.paths.map((p, i) => {
+            if (p.type === 'line') {
+              return (
+                <Line key={i}
+                  points={p.data}
+                  stroke={color} strokeWidth={strokeWidth / shape.scale}
+                />
+              )
+            }
+            if (p.type === 'circle') {
+              const [cx, cy, r] = p.data
+              return (
+                <Circle key={i}
+                  x={cx} y={cy} radius={r}
+                  stroke={color} strokeWidth={strokeWidth / shape.scale}
+                  fill={p.fill ? color : 'transparent'}
+                />
+              )
+            }
+            return (
+              <Line key={i}
+                points={p.data}
+                closed={p.closed}
+                stroke={color}
+                strokeWidth={strokeWidth / shape.scale}
+                fill={p.fill ? color + '44' : 'transparent'}
+              />
+            )
+          })}
+        </Group>
+      )
+    }
     case 'dimension': {
       const { x1, y1, x2, y2, offset, textHeight, arrowSize, orientation } = shape
       let lx1 = x1, ly1 = y1, lx2 = x2, ly2 = y2

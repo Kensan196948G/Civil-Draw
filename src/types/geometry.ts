@@ -57,6 +57,25 @@ export interface DimensionShape extends BaseShape {
   arrowSize: number
 }
 
+export type HatchPattern = 'parallel' | 'cross' | 'gravel' | 'earth'
+
+export interface HatchShape extends BaseShape {
+  type: 'hatch'
+  points: number[]
+  pattern: HatchPattern
+  angle: number
+  spacing: number
+}
+
+export interface SymbolShape extends BaseShape {
+  type: 'symbol'
+  symbolId: string
+  x: number
+  y: number
+  rotation: number
+  scale: number
+}
+
 export type Shape =
   | LineShape
   | RectShape
@@ -64,6 +83,8 @@ export type Shape =
   | PolylineShape
   | TextShape
   | DimensionShape
+  | HatchShape
+  | SymbolShape
 
 export type ToolType =
   | 'select'
@@ -73,6 +94,8 @@ export type ToolType =
   | 'polyline'
   | 'text'
   | 'dimension'
+  | 'hatch'
+  | 'symbol'
 
 export interface Point {
   x: number
