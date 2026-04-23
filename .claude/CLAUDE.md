@@ -7,8 +7,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **CivilDraw** (`civil-draw`) — 建設土木業向け Web ベース 2D CAD ツール。AutoCAD 代替として社内 9 拠点に展開する内製アプリ。
 
 - 仕様書: `建設土木向け平面図CADツール 要件定義・仕様書.md` (doc: CAD-REQ-2026-001 v1.0)
+- ロードマップ: `ROADMAP.md` (M1〜M6 月次マイルストーン)
 - 対象ブラウザ: Chrome / Edge 最新 2 バージョン
 - オフライン完全動作必須（外部サーバー通信禁止 / ISO 27001・J-SOX 準拠）
+
+## 🗓️ プロジェクト期間・リリース制約
+
+| 項目 | 値 |
+|------|-----|
+| プロジェクト期間 | **6ヶ月 (2026-04-23 〜 2026-10-23)** |
+| 本番リリース | 🚀 **2026-10-23 (絶対厳守)** |
+| 実行形態 | Linux Cron (Mon–Sat / 5時間 / 約144セッション) |
+| フェーズ変更 | CTO 判断で自由に変更可 |
+| リリース遅延 | ❌ 認めない — スコープ縮退で期日維持 |
+
+詳細は `ROADMAP.md` を参照。
 
 ## Tech Stack
 

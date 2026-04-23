@@ -9,6 +9,11 @@
 ![Coverage](https://img.shields.io/badge/Coverage-86%25-brightgreen)
 ![Tests](https://img.shields.io/badge/Tests-87_passed-brightgreen)
 ![Bundle](https://img.shields.io/badge/Initial_Bundle-485KB-blue)
+![Release](https://img.shields.io/badge/🚀_Release-2026--10--23-red)
+
+> 📅 **プロジェクト期間**: 2026-04-23 〜 2026-10-23 (6ヶ月)
+> 🚀 **本番リリース目標**: **2026-10-23 (絶対厳守)**
+> 📋 詳細ロードマップ: [`ROADMAP.md`](./ROADMAP.md)
 
 ---
 
@@ -286,31 +291,43 @@ flowchart LR
 
 ---
 
-## 📆 開発フェーズ進捗
+## 📆 6ヶ月ロードマップ (2026-04-23 → 2026-10-23)
 
 ```mermaid
 timeline
-    title CivilDraw Development Roadmap
-    section Phase 1 MVP ✅
-        2026-04-23 : Vite+React+TS 基盤
-                    : 7種描画 + 4種スナップ
-                    : レイヤー管理 + DXF/JSON
-    section Phase 2 ✅
-        2026-04-23 : 選択強化 (矩形・ドラッグ)
-                    : ハッチ 4 パターン
-                    : シンボル 8 種
-                    : PDF 出力
-    section Phase 3 (部分) ✅
-        2026-04-23 : DXF 読込 (LINE/CIRCLE/POLYLINE/TEXT)
-                    : Entra ID 認証 (未実装)
-                    : 9拠点展開 (未実装)
-    section UX/QA ✅
-        2026-04-23 : コピー/ペースト/複製
-                    : AutoSave localStorage
-                    : スナップ可視化
-                    : 操作ガイド (F1)
-                    : コード分割最適化
+    title CivilDraw 6-Month Roadmap to Production
+    section M1 基盤 ✅
+        2026-04-23 : Phase 1 MVP 完了
+                    : Phase 2 ハッチ/シンボル/PDF
+                    : Phase 3 IO-004 DXF 読込
+                    : UX (AutoSave/Copy/Help)
+    section M2 安定化&認証
+        2026-05-23 : 大量図形 60fps 検証
+                    : Entra ID 認証統合
+                    : E2E テスト基盤
+                    : DXF SPLINE/ELLIPSE 読込
+    section M3 機能拡張
+        2026-06-23 : テンプレート機能
+                    : シンボル 30 種 / ハッチ 10 種
+                    : 図形回転/ミラー
+                    : Playwright E2E シナリオ
+    section M4 α版 現場検証
+        2026-07-23 : v0.9-alpha 本社デモ
+                    : 1拠点試用 2週間
+                    : フィードバック反映
+    section M5 β版 UAT&ドキュメント
+        2026-08-23 : v0.95-beta 3拠点展開
+                    : UAT 計画/実施/合格
+                    : ユーザーマニュアル
+                    : ISO 27001 チェック
+    section M6 本番リリース
+        2026-09-23 : v1.0-rc ステージング
+                    : 本番環境構築
+        2026-10-23 : 🚀 v1.0 本番リリース
+                    : 9拠点展開完了
 ```
+
+詳細な月次タスクとリスク管理は [`ROADMAP.md`](./ROADMAP.md) を参照。
 
 ---
 
