@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useMemo, useState } from 'react'
 import { Stage, Layer, Rect } from 'react-konva'
 import { useCanvasStore } from '../../store/canvasStore'
 import { useLayerStore } from '../../store/layerStore'
@@ -56,6 +56,18 @@ export function CanvasArea() {
   const lastPanPos = useRef({ x: 0, y: 0 })
   const isDragging = useRef(false)
 
+  const [size, setSize] = useState({ w: 800, h: 600 })
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const update = () => setSize({ w: el.offsetWidth, h: el.offsetHeight })
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'Space' && !isSpacePanning.current) {
@@ -91,11 +103,6 @@ export function CanvasArea() {
       zoom, panX, panY,
     })
   }, [zoom, panX, panY, gridVisible, scale])
-
-  const getSize = () => ({
-    w: containerRef.current?.offsetWidth ?? 800,
-    h: containerRef.current?.offsetHeight ?? 600,
-  })
 
   const handleStageMouseMove = useCallback(
     (e: Parameters<typeof handleCanvasMouseMove>[0]) => {
@@ -134,17 +141,34 @@ export function CanvasArea() {
     [handleCanvasMouseUp, handleToolMouseUp],
   )
 
-  const { w, h } = getSize()
-  const layerById = new Map(layers.map((l) => [l.id, l]))
+  const { w, h } = size
   const selectionRect = selectionBox
     ? rectFromPoints(selectionBox.start, selectionBox.current)
     : null
 
-  const cullingEnabled = shouldCull(shapes.length)
-  const viewport = { zoom, panX, panY, width: w, height: h }
-  const visibleShapes = cullingEnabled
-    ? shapes.filter((s) => isInViewport(s, viewport))
-    : shapes
+  const layerById = useMemo(
+    () => new Map(layers.map((l) => [l.id, l])),
+    [layers],
+  )
+  const selectedIdSet = useMemo(() => new Set(selectedIds), [selectedIds])
+
+  const visibleShapes = useMemo(() => {
+    if (!shouldCull(shapes.length)) return shapes
+    const vp = { zoom, panX, panY, width: w, height: h }
+    return shapes.filter((s) => isInViewport(s, vp))
+  }, [shapes, zoom, panX, panY, w, h])
+
+  // Group visible shapes by layerId once per render (O(L+S) vs O(L*S) naive filter)
+  // and iterate layers in their existing order so draw order is preserved.
+  const shapesByLayer = useMemo(() => {
+    const map = new Map<string, typeof visibleShapes>()
+    for (const s of visibleShapes) {
+      const arr = map.get(s.layerId)
+      if (arr) arr.push(s)
+      else map.set(s.layerId, [s])
+    }
+    return map
+  }, [visibleShapes])
 
   return (
     <div
@@ -164,22 +188,26 @@ export function CanvasArea() {
         onDblClick={handleDoubleClick}
       >
         <Layer ref={gridLayerRef} />
+        {/* Static shapes layer — redraws only when shapes/layers/selection change */}
         <Layer>
-          {layers
-            .filter((l) => l.visible)
-            .flatMap((l) =>
-              visibleShapes
-                .filter((s) => s.layerId === l.id)
-                .map((s) => (
-                  <ShapeRenderer
-                    key={s.id}
-                    shape={s}
-                    layer={layerById.get(s.layerId)}
-                    isSelected={selectedIds.includes(s.id)}
-                    onSelect={(id) => setSelected([id])}
-                  />
-                )),
-            )}
+          {layers.flatMap((l) => {
+            if (!l.visible) return []
+            const arr = shapesByLayer.get(l.id)
+            if (!arr) return []
+            return arr.map((s) => (
+              <ShapeRenderer
+                key={s.id}
+                shape={s}
+                layer={l}
+                isSelected={selectedIdSet.has(s.id)}
+                onSelect={(id) => setSelected([id])}
+              />
+            ))
+          })}
+        </Layer>
+        {/* Dynamic layer — preview / selection rect / snap marker. Isolated so
+            frequent mouse-move updates do not invalidate the static layer. */}
+        <Layer listening={false}>
           {previewShape && (
             <ShapeRenderer
               key="__preview"
