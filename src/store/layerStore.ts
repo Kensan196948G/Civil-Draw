@@ -17,6 +17,7 @@ interface LayerState {
   activeLayerId: string
   history: Shape[][]
   historyIndex: number
+  clipboard: Shape[]
 
   addLayer: (layer?: Partial<Layer>) => void
   removeLayer: (id: string) => void
@@ -29,6 +30,10 @@ interface LayerState {
   removeShapes: (ids: string[]) => void
   moveShapes: (ids: string[], dx: number, dy: number) => void
   setSelected: (ids: string[]) => void
+
+  copySelection: () => void
+  pasteClipboard: (dx?: number, dy?: number) => void
+  duplicateSelection: () => void
 
   undo: () => void
   redo: () => void
@@ -57,6 +62,7 @@ export const useLayerStore = create<LayerState>()((set, get) => {
     activeLayerId: defaultLayers[0].id,
     history: [[]],
     historyIndex: 0,
+    clipboard: [],
 
     addLayer: (patch = {}) => {
       const layer: Layer = {
@@ -154,6 +160,78 @@ export const useLayerStore = create<LayerState>()((set, get) => {
     },
 
     setSelected: (selectedIds) => set({ selectedIds }),
+
+    copySelection: () => {
+      const { shapes, selectedIds } = get()
+      const copied = shapes.filter((s) => selectedIds.includes(s.id))
+      set({ clipboard: copied })
+    },
+
+    pasteClipboard: (dx = 20, dy = 20) => {
+      const { clipboard } = get()
+      if (clipboard.length === 0) return
+      const newShapes: Shape[] = clipboard.map((s) => {
+        const fresh = { ...s, id: nanoid() } as Shape
+        switch (fresh.type) {
+          case 'line':
+          case 'dimension':
+            return { ...fresh, x1: fresh.x1 + dx, y1: fresh.y1 + dy, x2: fresh.x2 + dx, y2: fresh.y2 + dy }
+          case 'rect':
+          case 'text':
+          case 'symbol':
+            return { ...fresh, x: fresh.x + dx, y: fresh.y + dy }
+          case 'circle':
+            return { ...fresh, cx: fresh.cx + dx, cy: fresh.cy + dy }
+          case 'polyline':
+          case 'hatch':
+            return {
+              ...fresh,
+              points: fresh.points.map((v, i) => (i % 2 === 0 ? v + dx : v + dy)),
+            }
+        }
+      })
+      const shapes = [...get().shapes, ...newShapes]
+      const h = pushHistory(get().history, get().historyIndex, shapes)
+      set({
+        shapes,
+        selectedIds: newShapes.map((s) => s.id),
+        ...h,
+      })
+    },
+
+    duplicateSelection: () => {
+      const { shapes, selectedIds } = get()
+      const toCopy = shapes.filter((s) => selectedIds.includes(s.id))
+      if (toCopy.length === 0) return
+      const dx = 20, dy = 20
+      const dups: Shape[] = toCopy.map((s) => {
+        const fresh = { ...s, id: nanoid() } as Shape
+        switch (fresh.type) {
+          case 'line':
+          case 'dimension':
+            return { ...fresh, x1: fresh.x1 + dx, y1: fresh.y1 + dy, x2: fresh.x2 + dx, y2: fresh.y2 + dy }
+          case 'rect':
+          case 'text':
+          case 'symbol':
+            return { ...fresh, x: fresh.x + dx, y: fresh.y + dy }
+          case 'circle':
+            return { ...fresh, cx: fresh.cx + dx, cy: fresh.cy + dy }
+          case 'polyline':
+          case 'hatch':
+            return {
+              ...fresh,
+              points: fresh.points.map((v, i) => (i % 2 === 0 ? v + dx : v + dy)),
+            }
+        }
+      })
+      const newShapes = [...shapes, ...dups]
+      const h = pushHistory(get().history, get().historyIndex, newShapes)
+      set({
+        shapes: newShapes,
+        selectedIds: dups.map((s) => s.id),
+        ...h,
+      })
+    },
 
     undo: () => {
       const { historyIndex, history } = get()

@@ -13,6 +13,9 @@ export default function App() {
   const undo = useLayerStore((s) => s.undo)
   const redo = useLayerStore((s) => s.redo)
   const removeShapes = useLayerStore((s) => s.removeShapes)
+  const copySelection = useLayerStore((s) => s.copySelection)
+  const pasteClipboard = useLayerStore((s) => s.pasteClipboard)
+  const duplicateSelection = useLayerStore((s) => s.duplicateSelection)
   const selectedIds = useLayerStore((s) => s.selectedIds)
   const setActiveTool = useToolStore((s) => s.setActiveTool)
 
@@ -23,6 +26,9 @@ export default function App() {
 
       if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo() }
       if (e.ctrlKey && (e.key === 'y' || e.key === 'Y')) { e.preventDefault(); redo() }
+      if (e.ctrlKey && (e.key === 'c' || e.key === 'C')) { e.preventDefault(); copySelection() }
+      if (e.ctrlKey && (e.key === 'v' || e.key === 'V')) { e.preventDefault(); pasteClipboard() }
+      if (e.ctrlKey && (e.key === 'd' || e.key === 'D')) { e.preventDefault(); duplicateSelection() }
       if (e.key === 'Delete' || e.key === 'Backspace') {
         if (selectedIds.length > 0) removeShapes(selectedIds)
       }
@@ -30,7 +36,7 @@ export default function App() {
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [undo, redo, removeShapes, selectedIds, setActiveTool])
+  }, [undo, redo, removeShapes, copySelection, pasteClipboard, duplicateSelection, selectedIds, setActiveTool])
 
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-white overflow-hidden">

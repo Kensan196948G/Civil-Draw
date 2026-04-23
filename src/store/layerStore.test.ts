@@ -12,6 +12,7 @@ function makeRect(id: string, layerId: string): RectShape {
 
 beforeEach(() => {
   useLayerStore.getState().clearDocument()
+  useLayerStore.setState({ clipboard: [] })
 })
 
 describe('layerStore — default layers', () => {
@@ -126,6 +127,45 @@ describe('layerStore — layer management', () => {
     const { shapes } = useLayerStore.getState()
     expect(shapes).toHaveLength(1)
     expect(shapes[0].id).toBe('s2')
+  })
+})
+
+describe('layerStore — clipboard / duplicate', () => {
+  it('copies selected shapes to clipboard', () => {
+    const { addShape, setSelected, copySelection, activeLayerId } = useLayerStore.getState()
+    addShape(makeLine('s1', activeLayerId))
+    setSelected(['s1'])
+    copySelection()
+    expect(useLayerStore.getState().clipboard).toHaveLength(1)
+  })
+
+  it('pastes from clipboard with offset', () => {
+    const { addShape, setSelected, copySelection, pasteClipboard, activeLayerId } = useLayerStore.getState()
+    addShape(makeLine('s1', activeLayerId))
+    setSelected(['s1'])
+    copySelection()
+    pasteClipboard()
+    const shapes = useLayerStore.getState().shapes
+    expect(shapes).toHaveLength(2)
+    const pasted = shapes.find((s) => s.id !== 's1') as LineShape
+    expect(pasted.x1).toBe(20) // 0 + 20 offset
+  })
+
+  it('duplicates selection in-place with offset', () => {
+    const { addShape, setSelected, duplicateSelection, activeLayerId } = useLayerStore.getState()
+    addShape(makeRect('r1', activeLayerId))
+    setSelected(['r1'])
+    duplicateSelection()
+    const state = useLayerStore.getState()
+    expect(state.shapes).toHaveLength(2)
+    expect(state.selectedIds).toHaveLength(1)
+    expect(state.selectedIds[0]).not.toBe('r1')
+  })
+
+  it('no-op when clipboard is empty', () => {
+    const { pasteClipboard } = useLayerStore.getState()
+    pasteClipboard()
+    expect(useLayerStore.getState().shapes).toHaveLength(0)
   })
 })
 

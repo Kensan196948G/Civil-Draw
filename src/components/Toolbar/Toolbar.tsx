@@ -2,11 +2,13 @@ import { useRef } from 'react'
 import { useCanvasStore, type Scale, type PaperSize, type PaperOrientation } from '../../store/canvasStore'
 import { useLayerStore } from '../../store/layerStore'
 import { downloadDxf, downloadJson, parseJson } from '../../utils/dxfExporter'
+import { importDxf } from '../../utils/dxfImporter'
 
 export function Toolbar() {
   const { scale, setScale, paperSize, setPaperSize, paperOrientation, setPaperOrientation, gridVisible, setGridVisible, resetView } = useCanvasStore()
   const { layers, shapes, clearDocument, loadDocument } = useLayerStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const dxfInputRef = useRef<HTMLInputElement>(null)
 
   const scales: Scale[] = [50, 100, 200, 500, 1000]
   const papers: PaperSize[] = ['A4', 'A3', 'A2', 'A1', 'A0']
@@ -32,6 +34,28 @@ export function Toolbar() {
     e.target.value = ''
   }
 
+  const handleDxfImport = () => dxfInputRef.current?.click()
+
+  const handleDxfFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      try {
+        const result = importDxf(ev.target?.result as string)
+        loadDocument(result.layers, result.shapes)
+        if (result.warnings.length > 0) {
+          const sample = result.warnings.slice(0, 5).join('\n')
+          alert(`DXF を読み込みました。\n注意:\n${sample}${result.warnings.length > 5 ? `\n... 他 ${result.warnings.length - 5} 件` : ''}`)
+        }
+      } catch (err) {
+        alert('DXF の読み込みに失敗しました: ' + (err instanceof Error ? err.message : String(err)))
+      }
+    }
+    reader.readAsText(file)
+    e.target.value = ''
+  }
+
   return (
     <div className="flex items-center gap-2 px-3 py-1 bg-gray-800 text-white text-xs border-b border-gray-700 flex-shrink-0">
       <span className="font-bold text-sm mr-2">CivilDraw</span>
@@ -39,9 +63,11 @@ export function Toolbar() {
       <button onClick={handleNew} className="px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded">新規</button>
       <button onClick={handleOpen} className="px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded">開く</button>
       <button onClick={handleSave} className="px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded">保存</button>
+      <button onClick={handleDxfImport} className="px-2 py-1 bg-indigo-700 hover:bg-indigo-600 rounded">DXF読込</button>
       <button onClick={handleDxf} className="px-2 py-1 bg-blue-700 hover:bg-blue-600 rounded">DXF出力</button>
       <button onClick={() => window.print()} className="px-2 py-1 bg-purple-700 hover:bg-purple-600 rounded">PDF出力</button>
       <input ref={fileInputRef} type="file" accept=".civil,.json" className="hidden" onChange={handleFileChange} />
+      <input ref={dxfInputRef} type="file" accept=".dxf" className="hidden" onChange={handleDxfFileChange} />
 
       <div className="w-px h-5 bg-gray-600 mx-1" />
 

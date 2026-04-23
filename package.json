@@ -13,6 +13,7 @@
     "lint": "eslint . && tsc --noEmit"
   },
   "dependencies": {
+    "dxf-parser": "^1.1.2",
     "dxf-writer": "^1.18.4",
     "konva": "^9.3.22",
     "nanoid": "^5.1.9",
