@@ -1,8 +1,7 @@
 import { useRef } from 'react'
 import { useCanvasStore, type Scale, type PaperSize, type PaperOrientation } from '../../store/canvasStore'
 import { useLayerStore } from '../../store/layerStore'
-import { downloadDxf, downloadJson, parseJson } from '../../utils/dxfExporter'
-import { importDxf } from '../../utils/dxfImporter'
+import { HelpDialog } from '../HelpDialog'
 
 export function Toolbar() {
   const { scale, setScale, paperSize, setPaperSize, paperOrientation, setPaperOrientation, gridVisible, setGridVisible, resetView } = useCanvasStore()
@@ -13,8 +12,14 @@ export function Toolbar() {
   const scales: Scale[] = [50, 100, 200, 500, 1000]
   const papers: PaperSize[] = ['A4', 'A3', 'A2', 'A1', 'A0']
 
-  const handleSave = () => downloadJson(layers, shapes)
-  const handleDxf = () => downloadDxf(layers, shapes)
+  const handleSave = async () => {
+    const { downloadJson } = await import('../../utils/dxfExporter')
+    downloadJson(layers, shapes)
+  }
+  const handleDxf = async () => {
+    const { downloadDxf } = await import('../../utils/dxfExporter')
+    downloadDxf(layers, shapes)
+  }
   const handleNew = () => { if (confirm('新規図面を作成しますか？現在の内容は失われます。')) clearDocument() }
   const handleOpen = () => fileInputRef.current?.click()
 
@@ -22,8 +27,9 @@ export function Toolbar() {
     const file = e.target.files?.[0]
     if (!file) return
     const reader = new FileReader()
-    reader.onload = (ev) => {
+    reader.onload = async (ev) => {
       try {
+        const { parseJson } = await import('../../utils/dxfExporter')
         const doc = parseJson(ev.target?.result as string)
         loadDocument(doc.layers, doc.shapes)
       } catch {
@@ -40,8 +46,9 @@ export function Toolbar() {
     const file = e.target.files?.[0]
     if (!file) return
     const reader = new FileReader()
-    reader.onload = (ev) => {
+    reader.onload = async (ev) => {
       try {
+        const { importDxf } = await import('../../utils/dxfImporter')
         const result = importDxf(ev.target?.result as string)
         loadDocument(result.layers, result.shapes)
         if (result.warnings.length > 0) {
@@ -111,6 +118,9 @@ export function Toolbar() {
       </label>
 
       <button onClick={resetView} className="px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded">表示リセット</button>
+
+      <div className="flex-1" />
+      <HelpDialog />
     </div>
   )
 }

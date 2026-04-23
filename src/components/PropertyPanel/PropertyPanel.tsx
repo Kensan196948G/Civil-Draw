@@ -103,6 +103,26 @@ function ShapeProps({ shape, onUpdate }: PropsProps) {
           <Row label="回転" value={shape.rotation} onChange={(v) => onUpdate({ rotation: v } as Partial<typeof shape>)} />
         </div>
       )
+    case 'symbol':
+      return (
+        <div className="space-y-1">
+          <p className="text-gray-400">シンボル: {shape.symbolId}</p>
+          <Row label="X" value={shape.x} onChange={(v) => onUpdate({ x: v } as Partial<typeof shape>)} />
+          <Row label="Y" value={shape.y} onChange={(v) => onUpdate({ y: v } as Partial<typeof shape>)} />
+          <Row label="回転°" value={shape.rotation} onChange={(v) => onUpdate({ rotation: v } as Partial<typeof shape>)} />
+          <Row label="拡大率" value={shape.scale} onChange={(v) => onUpdate({ scale: v } as Partial<typeof shape>)} />
+        </div>
+      )
+    case 'dimension':
+      return (
+        <div className="space-y-1">
+          <Row label="X1" value={shape.x1} onChange={(v) => onUpdate({ x1: v } as Partial<typeof shape>)} />
+          <Row label="Y1" value={shape.y1} onChange={(v) => onUpdate({ y1: v } as Partial<typeof shape>)} />
+          <Row label="X2" value={shape.x2} onChange={(v) => onUpdate({ x2: v } as Partial<typeof shape>)} />
+          <Row label="Y2" value={shape.y2} onChange={(v) => onUpdate({ y2: v } as Partial<typeof shape>)} />
+          <Row label="オフセット" value={shape.offset} onChange={(v) => onUpdate({ offset: v } as Partial<typeof shape>)} />
+        </div>
+      )
     default:
       return <p className="text-gray-500">プロパティなし</p>
   }
