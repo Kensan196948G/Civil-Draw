@@ -10,7 +10,8 @@ const LINE_STYLE_LABELS: Record<LineStyle, string> = {
 }
 
 export function LayerPanel() {
-  const { layers, activeLayerId, setActiveLayer, addLayer, removeLayer, updateLayer } = useLayerStore()
+  const { layers, activeLayerId, setActiveLayer, addLayer, removeLayer, updateLayer, reorderLayer } = useLayerStore()
+  const ordered = [...layers].sort((a, b) => a.order - b.order)
 
   return (
     <div className="flex flex-col h-full text-xs text-gray-200 bg-gray-800">
@@ -24,11 +25,15 @@ export function LayerPanel() {
         </button>
       </div>
       <div className="flex-1 overflow-y-auto">
-        {[...layers].sort((a, b) => a.order - b.order).map((layer) => (
+        {ordered.map((layer, index) => (
           <LayerRow
             key={layer.id}
             layer={layer}
             isActive={layer.id === activeLayerId}
+            canMoveUp={index > 0}
+            canMoveDown={index < ordered.length - 1}
+            onMoveUp={() => reorderLayer(index, index - 1)}
+            onMoveDown={() => reorderLayer(index, index + 1)}
             onActivate={() => setActiveLayer(layer.id)}
             onUpdate={(patch) => updateLayer(layer.id, patch)}
             onRemove={() => removeLayer(layer.id)}
@@ -43,13 +48,17 @@ export function LayerPanel() {
 interface RowProps {
   layer: Layer
   isActive: boolean
+  canMoveUp: boolean
+  canMoveDown: boolean
   onActivate: () => void
   onUpdate: (patch: Partial<Layer>) => void
   onRemove: () => void
+  onMoveUp: () => void
+  onMoveDown: () => void
   canRemove: boolean
 }
 
-function LayerRow({ layer, isActive, onActivate, onUpdate, onRemove, canRemove }: RowProps) {
+function LayerRow({ layer, isActive, canMoveUp, canMoveDown, onActivate, onUpdate, onRemove, onMoveUp, onMoveDown, canRemove }: RowProps) {
   return (
     <div
       className={`px-2 py-1 border-b border-gray-700 cursor-pointer
@@ -78,6 +87,22 @@ function LayerRow({ layer, isActive, onActivate, onUpdate, onRemove, canRemove }
           onChange={(e) => onUpdate({ name: e.target.value })}
           className="flex-1 bg-transparent border-none outline-none text-xs text-white min-w-0"
         />
+        <button
+          title="上へ"
+          disabled={!canMoveUp}
+          onClick={(e) => { e.stopPropagation(); onMoveUp() }}
+          className="text-gray-400 hover:text-white px-0.5 disabled:opacity-30"
+        >
+          ▲
+        </button>
+        <button
+          title="下へ"
+          disabled={!canMoveDown}
+          onClick={(e) => { e.stopPropagation(); onMoveDown() }}
+          className="text-gray-400 hover:text-white px-0.5 disabled:opacity-30"
+        >
+          ▼
+        </button>
         {canRemove && (
           <button
             onClick={(e) => { e.stopPropagation(); onRemove() }}

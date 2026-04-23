@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Toolbar } from './components/Toolbar/Toolbar'
 import { ToolPanel } from './components/ToolPanel/ToolPanel'
 import { ToolOptionsPanel } from './components/ToolPanel/ToolOptionsPanel'
@@ -8,6 +8,7 @@ import { PropertyPanel } from './components/PropertyPanel/PropertyPanel'
 import { StatusBar } from './components/StatusBar'
 import { useLayerStore } from './store/layerStore'
 import { useToolStore } from './store/toolStore'
+import { saveAutoSnapshot, loadAutoSnapshot, debounce } from './utils/autosave'
 
 export default function App() {
   const undo = useLayerStore((s) => s.undo)
@@ -18,6 +19,34 @@ export default function App() {
   const duplicateSelection = useLayerStore((s) => s.duplicateSelection)
   const selectedIds = useLayerStore((s) => s.selectedIds)
   const setActiveTool = useToolStore((s) => s.setActiveTool)
+  const loadDocument = useLayerStore((s) => s.loadDocument)
+  const restored = useRef(false)
+
+  useEffect(() => {
+    if (restored.current) return
+    restored.current = true
+    const snapshot = loadAutoSnapshot()
+    if (!snapshot) return
+    const ageHours = (Date.now() - snapshot.savedAt) / 1000 / 60 / 60
+    const when = ageHours < 1
+      ? `${Math.round(ageHours * 60)} 分前`
+      : `${Math.round(ageHours)} 時間前`
+    const ok = confirm(
+      `前回の自動保存（${when}）から ${snapshot.shapes.length} 図形を復元しますか？`,
+    )
+    if (ok && snapshot.layers.length > 0) {
+      loadDocument(snapshot.layers, snapshot.shapes)
+    }
+  }, [loadDocument])
+
+  useEffect(() => {
+    const persist = debounce(() => {
+      const { layers, shapes } = useLayerStore.getState()
+      saveAutoSnapshot(layers, shapes)
+    }, 1000)
+    const unsub = useLayerStore.subscribe(persist)
+    return unsub
+  }, [])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
