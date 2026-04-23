@@ -1,10 +1,12 @@
 import { useCanvasStore } from '../store/canvasStore'
 import { useLayerStore } from '../store/layerStore'
 import { useToolStore } from '../store/toolStore'
+import { FPSMeter } from './FPSMeter'
 
 export function StatusBar() {
   const { cursorX, cursorY, zoom, scale, gridSnap } = useCanvasStore()
   const selectedIds = useLayerStore((s) => s.selectedIds)
+  const shapeCount = useLayerStore((s) => s.shapes.length)
   const activeTool = useToolStore((s) => s.activeTool)
 
   return (
@@ -15,7 +17,10 @@ export function StatusBar() {
       <span>ズーム: {(zoom * 100).toFixed(0)}%</span>
       <span>スナップ: {gridSnap ? 'ON' : 'OFF'}</span>
       <span>ツール: {activeTool}</span>
+      <span>図形: {shapeCount}</span>
       {selectedIds.length > 0 && <span>選択: {selectedIds.length}</span>}
+      <div className="flex-1" />
+      <FPSMeter />
     </div>
   )
 }

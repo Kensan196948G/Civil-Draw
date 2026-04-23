@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { useCanvasStore, type Scale, type PaperSize, type PaperOrientation } from '../../store/canvasStore'
 import { useLayerStore } from '../../store/layerStore'
 import { HelpDialog } from '../HelpDialog'
+import { BenchmarkPanel } from '../BenchmarkPanel'
 
 export function Toolbar() {
   const {
@@ -138,6 +139,7 @@ export function Toolbar() {
       <button onClick={resetView} className="px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded">表示リセット</button>
 
       <div className="flex-1" />
+      <BenchmarkPanel />
       <HelpDialog />
     </div>
   )

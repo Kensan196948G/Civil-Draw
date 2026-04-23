@@ -99,10 +99,10 @@ export const useLayerStore = create<LayerState>()((set, get) => {
       })),
 
     reorderLayer: (fromIndex, toIndex) => {
-      const layers = [...get().layers]
-      const [moved] = layers.splice(fromIndex, 1)
-      layers.splice(toIndex, 0, moved)
-      set({ layers: layers.map((l, i) => ({ ...l, order: i })) })
+      const sorted = [...get().layers].sort((a, b) => a.order - b.order)
+      const [moved] = sorted.splice(fromIndex, 1)
+      sorted.splice(toIndex, 0, moved)
+      set({ layers: sorted.map((l, i) => ({ ...l, order: i })) })
     },
 
     setActiveLayer: (activeLayerId) => set({ activeLayerId }),

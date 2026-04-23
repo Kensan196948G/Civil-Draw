@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Line, Rect, Circle, Text, Arrow, Group } from 'react-konva'
 import type { Shape } from '../../types/geometry'
 import type { Layer } from '../../types/layer'
@@ -18,7 +19,7 @@ const DASH_PATTERNS: Record<string, number[]> = {
   dashdot: [10, 5, 2, 5],
 }
 
-export function ShapeRenderer({ shape, layer, isSelected, onSelect, isPreview = false }: Props) {
+function ShapeRendererImpl({ shape, layer, isSelected, onSelect, isPreview = false }: Props) {
   const color = isPreview ? '#888888' : (layer?.color ?? '#000000')
   const lineWidth = layer?.lineWidth ?? 1
   const dash = DASH_PATTERNS[layer?.lineStyle ?? 'solid']
@@ -33,6 +34,8 @@ export function ShapeRenderer({ shape, layer, isSelected, onSelect, isPreview = 
     dash,
     shadowBlur,
     shadowColor: '#4af',
+    shadowForStrokeEnabled: false,
+    perfectDrawEnabled: false,
     opacity: isPreview ? 0.6 : 1,
     onClick: handleClick,
     listening: !isPreview,
@@ -212,3 +215,17 @@ export function ShapeRenderer({ shape, layer, isSelected, onSelect, isPreview = 
     }
   }
 }
+
+export const ShapeRenderer = memo(ShapeRendererImpl, (prev, next) => {
+  // Fast-path equality: identical shape reference, same selection, same layer visual props
+  if (prev.shape !== next.shape) return false
+  if (prev.isSelected !== next.isSelected) return false
+  if (prev.isPreview !== next.isPreview) return false
+  if (prev.layer === next.layer) return true
+  if (!prev.layer || !next.layer) return false
+  return (
+    prev.layer.color === next.layer.color &&
+    prev.layer.lineStyle === next.layer.lineStyle &&
+    prev.layer.lineWidth === next.layer.lineWidth
+  )
+})

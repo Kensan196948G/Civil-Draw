@@ -158,8 +158,7 @@ export function CanvasArea() {
       >
         <Layer ref={gridLayerRef} />
         <Layer>
-          {[...layers]
-            .sort((a, b) => a.order - b.order)
+          {layers
             .filter((l) => l.visible)
             .flatMap((l) =>
               shapes

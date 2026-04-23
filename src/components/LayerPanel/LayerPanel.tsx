@@ -11,7 +11,8 @@ const LINE_STYLE_LABELS: Record<LineStyle, string> = {
 
 export function LayerPanel() {
   const { layers, activeLayerId, setActiveLayer, addLayer, removeLayer, updateLayer, reorderLayer } = useLayerStore()
-  const ordered = [...layers].sort((a, b) => a.order - b.order)
+  // Store guarantees layers are sorted by order ascending
+  const ordered = layers
 
   return (
     <div className="flex flex-col h-full text-xs text-gray-200 bg-gray-800">
