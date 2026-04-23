@@ -16,7 +16,19 @@ interface DxfEntity {
   textHeight?: number
   rotation?: number
   shape?: boolean
+  // SPLINE
+  controlPoints?: { x: number; y: number }[]
+  fitPoints?: { x: number; y: number }[]
+  closed?: boolean
+  // ELLIPSE
+  majorAxisEndPoint?: { x: number; y: number }
+  axisRatio?: number
+  startAngle?: number
+  endAngle?: number
 }
+
+const ELLIPSE_SEGMENTS = 64
+const TWO_PI = Math.PI * 2
 
 interface DxfDocument {
   entities?: DxfEntity[]
@@ -132,6 +144,55 @@ export function importDxf(content: string): ImportResult {
           text: ent.text ?? '',
           fontSize: ent.textHeight ?? 14,
           rotation: ent.rotation ?? 0,
+        })
+        break
+      }
+      case 'SPLINE': {
+        // fitPoints (curve-interpolation points) を優先、無ければ controlPoints を粗近似として使用
+        const src = (ent.fitPoints && ent.fitPoints.length >= 2)
+          ? ent.fitPoints
+          : ent.controlPoints
+        if (!src || src.length < 2) {
+          warnings.push('SPLINE: fitPoints/controlPoints が不足しているため無視')
+          break
+        }
+        const points: number[] = []
+        for (const p of src) points.push(p.x, p.y)
+        shapes.push({
+          id: nanoid(), type: 'polyline', layerId, locked: false,
+          points, closed: Boolean(ent.closed),
+        })
+        break
+      }
+      case 'ELLIPSE': {
+        if (!ent.center || !ent.majorAxisEndPoint) {
+          warnings.push('ELLIPSE: center/majorAxisEndPoint が不足しているため無視')
+          break
+        }
+        const cx = ent.center.x
+        const cy = ent.center.y
+        const mx = ent.majorAxisEndPoint.x
+        const my = ent.majorAxisEndPoint.y
+        const ratio = ent.axisRatio ?? 1
+        // 副軸ベクトル: 主軸を CCW 90° 回転 × axisRatio
+        const nx = -my * ratio
+        const ny = mx * ratio
+        const start = ent.startAngle ?? 0
+        let end = ent.endAngle ?? TWO_PI
+        if (end < start) end += TWO_PI
+        const sweep = end - start
+        const isFull = Math.abs(sweep - TWO_PI) < 1e-6
+        const segments = ELLIPSE_SEGMENTS
+        const points: number[] = []
+        for (let i = 0; i <= segments; i++) {
+          const t = start + (sweep * i) / segments
+          const x = cx + Math.cos(t) * mx + Math.sin(t) * nx
+          const y = cy + Math.cos(t) * my + Math.sin(t) * ny
+          points.push(x, y)
+        }
+        shapes.push({
+          id: nanoid(), type: 'polyline', layerId, locked: false,
+          points, closed: isFull,
         })
         break
       }
