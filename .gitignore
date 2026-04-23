@@ -8,3 +8,9 @@ coverage/
 playwright-report/
 test-results/
 /e2e/.cache/
+
+# Claude Code local runtime (session state, hooks, agents, skills)
+# Tracked policy docs are re-included below with negative patterns.
+.claude/
+!.claude/CLAUDE.md
+!.claude/START_PROMPT.md
