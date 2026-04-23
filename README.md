@@ -7,13 +7,15 @@
 [![CivilDraw CI](https://github.com/Kensan196948G/Civil-Draw/actions/workflows/ci.yml/badge.svg)](https://github.com/Kensan196948G/Civil-Draw/actions/workflows/ci.yml)
 ![Phase](https://img.shields.io/badge/Phase-1~3_部分完了-green)
 ![Coverage](https://img.shields.io/badge/Coverage-86%25-brightgreen)
-![Tests](https://img.shields.io/badge/Tests-87_passed-brightgreen)
+![Tests](https://img.shields.io/badge/Tests-103_passed_+_8_e2e-brightgreen)
 ![Bundle](https://img.shields.io/badge/Initial_Bundle-485KB-blue)
 ![Release](https://img.shields.io/badge/🚀_Release-2026--10--23-red)
 
 > 📅 **プロジェクト期間**: 2026-04-23 〜 2026-10-23 (6ヶ月)
 > 🚀 **本番リリース目標**: **2026-10-23 (絶対厳守)**
 > 📋 詳細ロードマップ: [`ROADMAP.md`](./ROADMAP.md)
+> ⚡ パフォーマンスレポート: [`docs/PERF_REPORT.md`](./docs/PERF_REPORT.md)
+> 🔐 認証設計書: [`docs/AUTH_DESIGN.md`](./docs/AUTH_DESIGN.md)
 
 ---
 
@@ -64,8 +66,10 @@ npm run dev
 | `npm run dev` | 🔧 開発サーバー起動 |
 | `npm run build` | 📦 本番ビルド (dist/) |
 | `npm run preview` | 👀 ビルド成果物プレビュー |
-| `npm run test` | ✅ 全テスト実行 (87 tests) |
+| `npm run test` | ✅ 全ユニットテスト実行 (103 tests) |
 | `npm run test:coverage` | 📊 カバレッジ付きテスト |
+| `npm run test:e2e` | 🎭 Playwright E2E テスト (8 scenarios) |
+| `npm run test:e2e:ui` | 🖱️ Playwright UI モード |
 | `npm run lint` | 🔍 ESLint + 型チェック |
 
 ---
@@ -336,10 +340,11 @@ timeline
 | 指標 | 目標 | 実績 |
 |------|------|------|
 | 🧪 テストカバレッジ | 70%+ | ✅ **86%** |
-| 📝 テスト数 | — | ✅ **87 passed** |
+| 📝 ユニットテスト数 | — | ✅ **103 passed** |
+| 🎭 E2E テスト数 | — | ✅ **8 scenarios (Playwright)** |
 | 🔒 TypeScript strict | エラーゼロ | ✅ |
-| 📦 初期バンドル | < 500KB | ✅ **485KB** (gzip 152KB) |
-| ⚡ 60fps 維持 | 10,000図形まで | ✅ Konva 実装 |
+| 📦 初期バンドル | < 500KB | ✅ **489KB** (gzip 153KB) |
+| ⚡ 60fps 維持 | 10,000図形まで | ✅ React.memo+culling+Konva最適化 実装済 |
 | ✅ CI | All pass | ✅ (10 連続成功) |
 | 🎯 GitHub Issues | Project 同期 | ✅ 9/9 Closed |
 
