@@ -340,9 +340,11 @@ timeline
                     : DOC-001 アーキテクチャ図 ✅
                     : UX-003 座標直接入力 ✅ (#37)
                     : E2E-002 M3新機能テスト ✅ (#38)
-                    : シンボル追加 🔲
+                    : SYM-001 シンボル 29種 ✅ (#25)
     section M4 α版 現場検証
-        2026-07-23 : v0.9-alpha 本社デモ
+        2026-07-23 : PERF-003 高DPI印刷 ✅ (#40 / PR #41)
+                    : RELEASE-α v0.9-alpha タグ
+                    : v0.9-alpha 本社デモ
                     : 1拠点試用 2週間
                     : フィードバック反映
     section M5 β版 UAT&ドキュメント
@@ -373,7 +375,7 @@ timeline
 | 📦 初期バンドル | < 500KB | ✅ **495KB** (gzip ~155KB) + dxf 動的 45KB |
 | ⚡ 60fps 維持 | 10,000図形まで | ✅ React.memo + culling + Konva最適化 + Layer分離 (PERF-002) 実装済 |
 | ✅ CI | All pass | ✅ (build-test + e2e-test 全 PR 通過) |
-| 🎯 GitHub Issues | Project 同期 | ✅ M1 9/9 / M2 完了 / M3 進行中 |
+| 🎯 GitHub Issues | Project 同期 | ✅ M1 9/9 / M2 完了 / M3 完了 / M4 PERF-003✅ |
 | 🏛️ アーキテクチャ文書 | — | ✅ **[docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)** |
 | 🤝 開発者ガイド | — | ✅ **[CONTRIBUTING.md](./CONTRIBUTING.md)** |
 
@@ -384,7 +386,7 @@ timeline
 本ツールは社内限ドキュメントに基づき開発されています。図面データは外部サーバーに送信されず、すべてローカルで処理されます。
 
 - 📄 DWG形式直接出力は不可 → DXF 経由で ODA File Converter で変換
-- 🖼️ 印刷解像度はモニター依存（高精細印刷はPDF経由推奨）
+- 🖼️ 印刷解像度: **高DPI対応** (Konva pixelRatio:3 = 288dpi 相当) — PDF出力ボタンから印刷プレビューウィンドウを開いて高品質印刷が可能
 - ☁️ クラウドストレージ連携は Phase 3 以降の検討事項
 - 💾 AutoSave は localStorage 限定（他端末への同期なし）
 
