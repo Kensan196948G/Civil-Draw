@@ -70,7 +70,7 @@ npm run dev
 | `npm run preview` | 👀 ビルド成果物プレビュー |
 | `npm run test` | ✅ 全ユニットテスト実行 (103 tests) |
 | `npm run test:coverage` | 📊 カバレッジ付きテスト |
-| `npm run test:e2e` | 🎭 Playwright E2E テスト (8 scenarios) |
+| `npm run test:e2e` | 🎭 Playwright E2E テスト (23 scenarios) |
 | `npm run test:e2e:ui` | 🖱️ Playwright UI モード |
 | `npm run lint` | 🔍 ESLint + 型チェック |
 
@@ -367,7 +367,7 @@ timeline
 |------|------|------|
 | 🧪 テストカバレッジ | 70%+ | ✅ **88%** |
 | 📝 ユニットテスト数 | — | ✅ **120+ passed** (templateCatalog +17 含む) |
-| 🎭 E2E テスト数 | — | ✅ **8 scenarios (Playwright)** |
+| 🎭 E2E テスト数 | — | ✅ **23 scenarios (Playwright)** |
 | 🔒 TypeScript strict | エラーゼロ | ✅ |
 | 🛡️ CSP meta | 9 directives | ✅ **index.html に適用** ([docs/SECURITY_AUDIT.md](./docs/SECURITY_AUDIT.md)) |
 | 📦 初期バンドル | < 500KB | ✅ **495KB** (gzip ~155KB) + dxf 動的 45KB |
