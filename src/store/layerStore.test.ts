@@ -193,3 +193,46 @@ describe('layerStore — document load/clear', () => {
     expect(state.shapes).toHaveLength(0)
   })
 })
+
+describe('layerStore — bulkUpdateShapes', () => {
+  it('moves multiple shapes to a new layer', () => {
+    const { addShape, addLayer, bulkUpdateShapes, activeLayerId, layers } = useLayerStore.getState()
+    addShape(makeLine('s1', activeLayerId))
+    addShape(makeRect('s2', activeLayerId))
+    const newLayerId = useLayerStore.getState().layers[1].id
+    bulkUpdateShapes(['s1', 's2'], { layerId: newLayerId })
+    const { shapes } = useLayerStore.getState()
+    expect(shapes.every((s) => s.layerId === newLayerId)).toBe(true)
+    void layers; void addLayer
+  })
+
+  it('locks multiple shapes at once', () => {
+    const { addShape, bulkUpdateShapes, activeLayerId } = useLayerStore.getState()
+    addShape(makeLine('s1', activeLayerId))
+    addShape(makeRect('s2', activeLayerId))
+    bulkUpdateShapes(['s1', 's2'], { locked: true })
+    const { shapes } = useLayerStore.getState()
+    expect(shapes.every((s) => s.locked)).toBe(true)
+  })
+
+  it('only affects specified ids', () => {
+    const { addShape, bulkUpdateShapes, activeLayerId } = useLayerStore.getState()
+    addShape(makeLine('s1', activeLayerId))
+    addShape(makeRect('s2', activeLayerId))
+    const newLayerId = useLayerStore.getState().layers[1].id
+    bulkUpdateShapes(['s1'], { layerId: newLayerId })
+    const { shapes } = useLayerStore.getState()
+    expect(shapes.find((s) => s.id === 's1')?.layerId).toBe(newLayerId)
+    expect(shapes.find((s) => s.id === 's2')?.layerId).toBe(activeLayerId)
+  })
+
+  it('pushes to history for undo support', () => {
+    const { addShape, bulkUpdateShapes, activeLayerId } = useLayerStore.getState()
+    addShape(makeLine('s1', activeLayerId))
+    const { historyIndex: before } = useLayerStore.getState()
+    const newLayerId = useLayerStore.getState().layers[1].id
+    bulkUpdateShapes(['s1'], { layerId: newLayerId })
+    const { historyIndex: after } = useLayerStore.getState()
+    expect(after).toBe(before + 1)
+  })
+})

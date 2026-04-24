@@ -36,6 +36,7 @@ interface LayerState {
   pasteClipboard: (dx?: number, dy?: number) => void
   duplicateSelection: () => void
   transformSelectedShapes: (op: TransformOp) => void
+  bulkUpdateShapes: (ids: string[], patch: { layerId?: string; locked?: boolean }) => void
 
   undo: () => void
   redo: () => void
@@ -233,6 +234,14 @@ export const useLayerStore = create<LayerState>()((set, get) => {
         selectedIds: dups.map((s) => s.id),
         ...h,
       })
+    },
+
+    bulkUpdateShapes: (ids, patch) => {
+      const shapes = get().shapes.map((s) =>
+        ids.includes(s.id) ? ({ ...s, ...patch } as Shape) : s,
+      )
+      const h = pushHistory(get().history, get().historyIndex, shapes)
+      set({ shapes, ...h })
     },
 
     transformSelectedShapes: (op) => {
