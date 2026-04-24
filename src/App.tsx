@@ -5,6 +5,7 @@ import { ToolOptionsPanel } from './components/ToolPanel/ToolOptionsPanel'
 import { CanvasArea } from './components/Canvas/CanvasArea'
 import { LayerPanel } from './components/LayerPanel/LayerPanel'
 import { PropertyPanel } from './components/PropertyPanel/PropertyPanel'
+import { TemplatePanel } from './components/TemplatePanel/TemplatePanel'
 import { StatusBar } from './components/StatusBar'
 import { useLayerStore } from './store/layerStore'
 import { useToolStore } from './store/toolStore'
@@ -75,6 +76,7 @@ export default function App() {
         <CanvasArea />
         <div className="flex flex-col w-60 border-l border-gray-700 flex-shrink-0 no-print">
           <ToolOptionsPanel />
+          <TemplatePanel />
           <div className="flex-1 overflow-y-auto">
             <LayerPanel />
           </div>
