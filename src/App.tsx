@@ -6,6 +6,7 @@ import { CanvasArea } from './components/Canvas/CanvasArea'
 import { LayerPanel } from './components/LayerPanel/LayerPanel'
 import { PropertyPanel } from './components/PropertyPanel/PropertyPanel'
 import { TemplatePanel } from './components/TemplatePanel/TemplatePanel'
+import { CommandBar } from './components/CommandBar/CommandBar'
 import { StatusBar } from './components/StatusBar'
 import { useLayerStore } from './store/layerStore'
 import { useToolStore } from './store/toolStore'
@@ -20,6 +21,7 @@ export default function App() {
   const duplicateSelection = useLayerStore((s) => s.duplicateSelection)
   const selectedIds = useLayerStore((s) => s.selectedIds)
   const setActiveTool = useToolStore((s) => s.setActiveTool)
+  const activeTool = useToolStore((s) => s.activeTool)
   const loadDocument = useLayerStore((s) => s.loadDocument)
   const restored = useRef(false)
 
@@ -73,7 +75,14 @@ export default function App() {
       <div className="no-print"><Toolbar /></div>
       <div className="flex flex-1 overflow-hidden">
         <div className="no-print"><ToolPanel /></div>
-        <CanvasArea />
+        <div className="flex flex-col flex-1 overflow-hidden">
+          <CanvasArea />
+          {activeTool !== 'select' && (
+            <div className="no-print shrink-0">
+              <CommandBar key={activeTool} />
+            </div>
+          )}
+        </div>
         <div className="flex flex-col w-60 border-l border-gray-700 flex-shrink-0 no-print">
           <ToolOptionsPanel />
           <TemplatePanel />
