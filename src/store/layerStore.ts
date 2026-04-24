@@ -3,6 +3,7 @@ import { nanoid } from 'nanoid'
 import type { Shape } from '../types/geometry'
 import type { Layer } from '../types/layer'
 import { DEFAULT_LAYERS } from '../types/layer'
+import { computeCentroid, transformShape, type TransformOp } from '../utils/shapeTransform'
 
 const HISTORY_LIMIT = 100
 
@@ -34,6 +35,7 @@ interface LayerState {
   copySelection: () => void
   pasteClipboard: (dx?: number, dy?: number) => void
   duplicateSelection: () => void
+  transformSelectedShapes: (op: TransformOp) => void
 
   undo: () => void
   redo: () => void
@@ -231,6 +233,18 @@ export const useLayerStore = create<LayerState>()((set, get) => {
         selectedIds: dups.map((s) => s.id),
         ...h,
       })
+    },
+
+    transformSelectedShapes: (op) => {
+      const { shapes, selectedIds } = get()
+      if (selectedIds.length === 0) return
+      const selected = shapes.filter((s) => selectedIds.includes(s.id))
+      const { cx, cy } = computeCentroid(selected)
+      const newShapes = shapes.map((s) =>
+        selectedIds.includes(s.id) ? transformShape(s, cx, cy, op) : s,
+      )
+      const h = pushHistory(get().history, get().historyIndex, newShapes)
+      set({ shapes: newShapes, ...h })
     },
 
     undo: () => {
