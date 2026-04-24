@@ -105,10 +105,27 @@ export function generateHatchLines(
     case 'cross':
       return [...makeLines(rad), ...makeLines(rad + Math.PI / 2)]
     case 'earth':
-      // 45度と135度のクロス
       return [...makeLines(Math.PI / 4), ...makeLines((Math.PI * 3) / 4)]
     case 'gravel':
-      // 粗い平行線
       return makeLines(rad)
+    // Fixed-angle patterns — independent of user's angle slider
+    case 'concrete':
+      // 0°+90° rectangular grid (JIS concrete)
+      return [...makeLines(0), ...makeLines(Math.PI / 2)]
+    case 'rock':
+      // 0°+60°+120° triangular mesh (rock/granite)
+      return [...makeLines(0), ...makeLines(Math.PI / 3), ...makeLines((2 * Math.PI) / 3)]
+    case 'asphalt':
+      // 30°+150° diamond (steeper than earth)
+      return [...makeLines(Math.PI / 6), ...makeLines((5 * Math.PI) / 6)]
+    case 'wood':
+      // Fixed horizontal lines (0°)
+      return makeLines(0)
+    case 'steel':
+      // 45°+90° diagonal+vertical (steel cross-section)
+      return [...makeLines(Math.PI / 4), ...makeLines(Math.PI / 2)]
+    case 'water':
+      // 0°+10° near-horizontal double lines (wave effect)
+      return [...makeLines(0), ...makeLines(Math.PI / 18)]
   }
 }

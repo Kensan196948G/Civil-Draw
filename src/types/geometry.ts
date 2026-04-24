@@ -57,7 +57,9 @@ export interface DimensionShape extends BaseShape {
   arrowSize: number
 }
 
-export type HatchPattern = 'parallel' | 'cross' | 'gravel' | 'earth'
+export type HatchPattern =
+  | 'parallel' | 'cross' | 'gravel' | 'earth'
+  | 'concrete' | 'rock' | 'asphalt' | 'wood' | 'steel' | 'water'
 
 export interface HatchShape extends BaseShape {
   type: 'hatch'

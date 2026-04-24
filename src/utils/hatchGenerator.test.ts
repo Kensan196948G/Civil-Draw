@@ -60,4 +60,42 @@ describe('generateHatchLines', () => {
     const loose = generateHatchLines(SQUARE, 'parallel', 0, 50)
     expect(tight.length).toBeGreaterThan(loose.length)
   })
+
+  it('concrete pattern produces fixed 0°+90° grid regardless of user angle', () => {
+    const a0 = generateHatchLines(SQUARE, 'concrete', 0, 20)
+    const a45 = generateHatchLines(SQUARE, 'concrete', 45, 20)
+    expect(a0.length).toBeGreaterThan(0)
+    expect(a0.length).toBe(a45.length)
+  })
+
+  it('rock pattern produces more lines than earth (3 directions vs 2)', () => {
+    const earth = generateHatchLines(SQUARE, 'earth', 0, 20)
+    const rock = generateHatchLines(SQUARE, 'rock', 0, 20)
+    expect(rock.length).toBeGreaterThan(earth.length)
+  })
+
+  it('asphalt pattern produces lines (fixed 30°+150°)', () => {
+    const lines = generateHatchLines(SQUARE, 'asphalt', 0, 20)
+    expect(lines.length).toBeGreaterThan(0)
+  })
+
+  it('wood pattern produces horizontal lines (fixed 0°)', () => {
+    const w0 = generateHatchLines(SQUARE, 'wood', 0, 20)
+    const w90 = generateHatchLines(SQUARE, 'wood', 90, 20)
+    expect(w0.length).toBeGreaterThan(0)
+    expect(w0.length).toBe(w90.length)
+  })
+
+  it('steel pattern produces more lines than wood (2 directions vs 1)', () => {
+    const wood = generateHatchLines(SQUARE, 'wood', 0, 20)
+    const steel = generateHatchLines(SQUARE, 'steel', 0, 20)
+    expect(steel.length).toBeGreaterThan(wood.length)
+  })
+
+  it('water pattern produces double near-horizontal lines', () => {
+    const lines = generateHatchLines(SQUARE, 'water', 0, 20)
+    expect(lines.length).toBeGreaterThan(0)
+    const wood = generateHatchLines(SQUARE, 'wood', 0, 20)
+    expect(lines.length).toBeGreaterThan(wood.length)
+  })
 })

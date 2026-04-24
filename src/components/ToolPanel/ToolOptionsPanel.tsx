@@ -7,6 +7,12 @@ const PATTERNS: { id: HatchPattern; label: string }[] = [
   { id: 'cross', label: 'クロス' },
   { id: 'earth', label: '土工 (45°x)' },
   { id: 'gravel', label: '砂利' },
+  { id: 'concrete', label: 'コンクリート' },
+  { id: 'rock', label: '岩盤' },
+  { id: 'asphalt', label: 'アスファルト' },
+  { id: 'wood', label: '木材' },
+  { id: 'steel', label: '鋼材' },
+  { id: 'water', label: '水/湿地' },
 ]
 
 export function ToolOptionsPanel() {
