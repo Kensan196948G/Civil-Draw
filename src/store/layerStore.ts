@@ -4,6 +4,7 @@ import type { Shape } from '../types/geometry'
 import type { Layer } from '../types/layer'
 import { DEFAULT_LAYERS } from '../types/layer'
 import { computeCentroid, transformShape, type TransformOp } from '../utils/shapeTransform'
+import { TEMPLATE_CATALOG } from '../utils/templateCatalog'
 
 const HISTORY_LIMIT = 100
 
@@ -37,6 +38,7 @@ interface LayerState {
   duplicateSelection: () => void
   transformSelectedShapes: (op: TransformOp) => void
   bulkUpdateShapes: (ids: string[], patch: { layerId?: string; locked?: boolean }) => void
+  insertTemplate: (templateId: string, cx: number, cy: number) => void
 
   undo: () => void
   redo: () => void
@@ -242,6 +244,33 @@ export const useLayerStore = create<LayerState>()((set, get) => {
       )
       const h = pushHistory(get().history, get().historyIndex, shapes)
       set({ shapes, ...h })
+    },
+
+    insertTemplate: (templateId, cx, cy) => {
+      const { activeLayerId } = get()
+      const def = TEMPLATE_CATALOG.find((t) => t.id === templateId)
+      if (!def) return
+      const newShapes: Shape[] = def.shapes.map((tpl) => {
+        const base = { id: nanoid(), layerId: activeLayerId, locked: false }
+        const s = { ...base, ...tpl } as Shape
+        switch (s.type) {
+          case 'line':
+          case 'dimension':
+            return { ...s, x1: s.x1 + cx, y1: s.y1 + cy, x2: s.x2 + cx, y2: s.y2 + cy }
+          case 'rect':
+          case 'text':
+          case 'symbol':
+            return { ...s, x: s.x + cx, y: s.y + cy }
+          case 'circle':
+            return { ...s, cx: s.cx + cx, cy: s.cy + cy }
+          case 'polyline':
+          case 'hatch':
+            return { ...s, points: s.points.map((v, i) => (i % 2 === 0 ? v + cx : v + cy)) }
+        }
+      })
+      const shapes = [...get().shapes, ...newShapes]
+      const h = pushHistory(get().history, get().historyIndex, shapes)
+      set({ shapes, selectedIds: newShapes.map((s) => s.id), ...h })
     },
 
     transformSelectedShapes: (op) => {
