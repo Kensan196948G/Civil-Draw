@@ -1,8 +1,9 @@
 import { useLayerStore } from '../../store/layerStore'
 import type { Shape } from '../../types/geometry'
+import type { Layer } from '../../types/layer'
 
 export function PropertyPanel() {
-  const { shapes, selectedIds, updateShape, removeShapes } = useLayerStore()
+  const { shapes, layers, selectedIds, updateShape, removeShapes, bulkUpdateShapes } = useLayerStore()
   const selected = shapes.filter((s) => selectedIds.includes(s.id))
 
   if (selected.length === 0) {
@@ -15,15 +16,13 @@ export function PropertyPanel() {
 
   if (selected.length > 1) {
     return (
-      <div className="p-2 text-xs text-gray-200 bg-gray-800">
-        <p className="mb-2">{selected.length} 件選択中</p>
-        <button
-          onClick={() => removeShapes(selectedIds)}
-          className="px-2 py-1 bg-red-700 hover:bg-red-600 rounded text-xs"
-        >
-          削除
-        </button>
-      </div>
+      <BulkPanel
+        count={selected.length}
+        shapes={selected}
+        layers={layers}
+        onBulkUpdate={(patch) => bulkUpdateShapes(selectedIds, patch)}
+        onDelete={() => removeShapes(selectedIds)}
+      />
     )
   }
 
@@ -37,6 +36,56 @@ export function PropertyPanel() {
         className="mt-2 px-2 py-1 bg-red-700 hover:bg-red-600 rounded text-xs w-full"
       >
         削除
+      </button>
+    </div>
+  )
+}
+
+interface BulkPanelProps {
+  count: number
+  shapes: Shape[]
+  layers: Layer[]
+  onBulkUpdate: (patch: { layerId?: string; locked?: boolean }) => void
+  onDelete: () => void
+}
+
+function BulkPanel({ count, shapes, layers, onBulkUpdate, onDelete }: BulkPanelProps) {
+  const commonLayerId = shapes.every((s) => s.layerId === shapes[0].layerId) ? shapes[0].layerId : ''
+  const allLocked = shapes.every((s) => s.locked)
+
+  return (
+    <div className="p-2 text-xs text-gray-200 bg-gray-800 space-y-2">
+      <p className="font-semibold">{count} 件選択中</p>
+
+      <label className="block">
+        <span className="text-gray-400">レイヤー移動</span>
+        <select
+          value={commonLayerId}
+          onChange={(e) => e.target.value && onBulkUpdate({ layerId: e.target.value })}
+          className="mt-0.5 w-full bg-gray-700 border border-gray-600 rounded px-1"
+        >
+          {commonLayerId === '' && <option value="">—複数レイヤー—</option>}
+          {layers.map((l) => (
+            <option key={l.id} value={l.id}>{l.name}</option>
+          ))}
+        </select>
+      </label>
+
+      <label className="flex items-center gap-2 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={allLocked}
+          onChange={(e) => onBulkUpdate({ locked: e.target.checked })}
+          className="w-3 h-3"
+        />
+        <span>ロック</span>
+      </label>
+
+      <button
+        onClick={onDelete}
+        className="w-full px-2 py-1 bg-red-700 hover:bg-red-600 rounded text-xs"
+      >
+        削除 ({count})
       </button>
     </div>
   )
