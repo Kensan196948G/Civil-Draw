@@ -5,10 +5,10 @@
 > 📄 **社内限ドキュメント番号**: CAD-REQ-2026-001 v1.0 | ITシステム運用管理部
 
 [![CivilDraw CI](https://github.com/Kensan196948G/Civil-Draw/actions/workflows/ci.yml/badge.svg)](https://github.com/Kensan196948G/Civil-Draw/actions/workflows/ci.yml)
-![Phase](https://img.shields.io/badge/Phase-1~3_部分完了-green)
-![Coverage](https://img.shields.io/badge/Coverage-86%25-brightgreen)
-![Tests](https://img.shields.io/badge/Tests-103_passed_+_8_e2e-brightgreen)
-![Bundle](https://img.shields.io/badge/Initial_Bundle-485KB-blue)
+![Phase](https://img.shields.io/badge/Phase-M3_進行中-yellow)
+![Coverage](https://img.shields.io/badge/Coverage-88%25-brightgreen)
+![Tests](https://img.shields.io/badge/Tests-120_passed_+_8_e2e-brightgreen)
+![Bundle](https://img.shields.io/badge/Initial_Bundle-495KB-blue)
 ![Release](https://img.shields.io/badge/🚀_Release-2026--10--23-red)
 
 > 📅 **プロジェクト期間**: 2026-04-23 〜 2026-10-23 (6ヶ月)
@@ -16,6 +16,8 @@
 > 📋 詳細ロードマップ: [`ROADMAP.md`](./ROADMAP.md)
 > ⚡ パフォーマンスレポート: [`docs/PERF_REPORT.md`](./docs/PERF_REPORT.md)
 > 🔐 認証設計書: [`docs/AUTH_DESIGN.md`](./docs/AUTH_DESIGN.md)
+> 🏛️ アーキテクチャ設計書: [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
+> 🤝 開発者ガイド: [`CONTRIBUTING.md`](./CONTRIBUTING.md)
 
 ---
 
@@ -162,7 +164,8 @@ src/
 │   │   ├── ToolPanel.tsx         # 9種ツール選択
 │   │   └── ToolOptionsPanel.tsx  # ハッチ・シンボル設定
 │   ├── LayerPanel/LayerPanel.tsx # 並べ替え・表示・ロック
-│   ├── PropertyPanel/PropertyPanel.tsx
+│   ├── PropertyPanel/PropertyPanel.tsx  # 単体/一括プロパティ編集
+│   ├── TemplatePanel/TemplatePanel.tsx  # プリセットパターン挿入
 │   ├── HelpDialog.tsx            # F1 で表示
 │   └── StatusBar.tsx
 ├── 🪝 hooks/
@@ -180,6 +183,7 @@ src/
 │   ├── selection.ts             # BBox・矩形選択
 │   ├── hatchGenerator.ts        # ポリゴンクリップ
 │   ├── symbolCatalog.ts         # 8シンボル
+│   ├── templateCatalog.ts       # 4プリセットテンプレート (DistributiveOmit)
 │   ├── autosave.ts              # localStorage + debounce
 │   └── gridRenderer.ts
 └── 📝 types/
@@ -210,13 +214,17 @@ src/
 | DT-009 | 🚧 シンボルライブラリ | 仮設/土工/測量/車両 8種 |
 | IO-005 | 🖨️ PDF 出力 | window.print + @media print |
 
-### ✅ Phase 3 部分完了
+### ✅ Phase 3 M3 (進行中)
 
 | ID | 機能 | 状態 |
 |---|---|---|
-| IO-004 | 📥 DXF 読込 (LINE/CIRCLE/POLYLINE/TEXT) | ✅ |
-| — | 🔐 Entra ID 認証 | 未実装（運用・認証基盤） |
-| — | 🌐 9拠点 Web 展開 | 未実装（インフラ） |
+| IO-004 | 📥 DXF 読込 (LINE/CIRCLE/POLYLINE/TEXT) | ✅ M2 完了 |
+| UX-002 | 🧩 複数選択一括プロパティ変更 (レイヤー移動/ロック) | ✅ PR #32 merged |
+| IO-006 | 🏗️ テンプレート機能 (4 カテゴリ 4 プリセット) | ✅ PR #34 merged |
+| DOC-001 | 🏛️ アーキテクチャ図 + 開発者ガイド | ✅ 本 PR |
+| UX-003 | ⌨️ 座標直接入力 | 🔲 未実装 |
+| AUTH-001 | 🔐 Entra ID 認証 | ⛔ IT部門AppReg取得待ち |
+| — | 🌐 9拠点 Web 展開 | ⛔ インフラ待ち |
 
 ### 🎁 追加実装 (仕様書外 + UX)
 
@@ -229,6 +237,9 @@ src/
 | 🎚️ スナップトグル | 4種 ON/OFF をツールバーから制御 |
 | 📚 レイヤー並べ替え | ▲/▼ ボタン |
 | ❓ 操作ガイド | F1 / ? キーで表示 |
+| 🔄 図形回転/ミラー | CW/CCW/H/V — 選択中心に変換 |
+| 🧩 一括編集パネル | 複数選択時 レイヤー移動・ロック・削除 |
+| 🏗️ テンプレートパネル | 工事ゾーン/土工断面/舗装断面/測量レイアウト |
 
 ### 🧱 ハッチングパターン
 
@@ -313,10 +324,11 @@ timeline
                     : CSP + XSS 監査 ✅ (#17 / PR #18)
                     : Konva Layer 分離 🟡 (#19 / PR #20)
     section M3 機能拡張
-        2026-06-23 : テンプレート機能
-                    : シンボル 30 種 / ハッチ 10 種
-                    : 図形回転/ミラー
-                    : Playwright E2E シナリオ
+        2026-06-23 : UX-002 一括プロパティ変更 ✅
+                    : IO-006 テンプレート機能 ✅
+                    : DOC-001 アーキテクチャ図 ✅
+                    : UX-003 座標直接入力 🔲
+                    : シンボル追加 🔲
     section M4 α版 現場検証
         2026-07-23 : v0.9-alpha 本社デモ
                     : 1拠点試用 2週間
@@ -341,15 +353,17 @@ timeline
 
 | 指標 | 目標 | 実績 |
 |------|------|------|
-| 🧪 テストカバレッジ | 70%+ | ✅ **86%** |
-| 📝 ユニットテスト数 | — | ✅ **103 passed + SEC-001 新規 13** |
+| 🧪 テストカバレッジ | 70%+ | ✅ **88%** |
+| 📝 ユニットテスト数 | — | ✅ **120+ passed** (templateCatalog +17 含む) |
 | 🎭 E2E テスト数 | — | ✅ **8 scenarios (Playwright)** |
 | 🔒 TypeScript strict | エラーゼロ | ✅ |
 | 🛡️ CSP meta | 9 directives | ✅ **index.html に適用** ([docs/SECURITY_AUDIT.md](./docs/SECURITY_AUDIT.md)) |
-| 📦 初期バンドル | < 500KB | ✅ **489KB** (gzip 153KB) + dxf 動的 45KB |
+| 📦 初期バンドル | < 500KB | ✅ **495KB** (gzip ~155KB) + dxf 動的 45KB |
 | ⚡ 60fps 維持 | 10,000図形まで | ✅ React.memo + culling + Konva最適化 + Layer分離 (PERF-002) 実装済 |
-| ✅ CI | All pass | ✅ (13 連続成功 / build-test + e2e-test) |
-| 🎯 GitHub Issues | Project 同期 | ✅ M1 9/9 Closed / M2 進行中 |
+| ✅ CI | All pass | ✅ (build-test + e2e-test 全 PR 通過) |
+| 🎯 GitHub Issues | Project 同期 | ✅ M1 9/9 / M2 完了 / M3 進行中 |
+| 🏛️ アーキテクチャ文書 | — | ✅ **[docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)** |
+| 🤝 開発者ガイド | — | ✅ **[CONTRIBUTING.md](./CONTRIBUTING.md)** |
 
 ---
 
