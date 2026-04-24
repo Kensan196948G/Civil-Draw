@@ -3,6 +3,7 @@ import { useCanvasStore, type Scale, type PaperSize, type PaperOrientation } fro
 import { useLayerStore } from '../../store/layerStore'
 import { HelpDialog } from '../HelpDialog'
 import { BenchmarkPanel } from '../BenchmarkPanel'
+import type { TransformOp } from '../../utils/shapeTransform'
 
 export function Toolbar() {
   const {
@@ -16,7 +17,8 @@ export function Toolbar() {
     snapIntersection, setSnapIntersection,
     resetView,
   } = useCanvasStore()
-  const { layers, shapes, clearDocument, loadDocument } = useLayerStore()
+  const { layers, shapes, selectedIds, clearDocument, loadDocument, transformSelectedShapes } = useLayerStore()
+  const hasSelection = selectedIds.length > 0
   const fileInputRef = useRef<HTMLInputElement>(null)
   const dxfInputRef = useRef<HTMLInputElement>(null)
 
@@ -138,10 +140,34 @@ export function Toolbar() {
 
       <button onClick={resetView} className="px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded">表示リセット</button>
 
+      <div className="w-px h-5 bg-gray-600 mx-1" />
+      <TransformButton label="↻CW" op="rotateCW" enabled={hasSelection} onClick={transformSelectedShapes} />
+      <TransformButton label="↺CCW" op="rotateCCW" enabled={hasSelection} onClick={transformSelectedShapes} />
+      <TransformButton label="⇔" op="mirrorH" enabled={hasSelection} onClick={transformSelectedShapes} />
+      <TransformButton label="⇕" op="mirrorV" enabled={hasSelection} onClick={transformSelectedShapes} />
+
       <div className="flex-1" />
       <BenchmarkPanel />
       <HelpDialog />
     </div>
+  )
+}
+
+function TransformButton({ label, op, enabled, onClick }: {
+  label: string
+  op: TransformOp
+  enabled: boolean
+  onClick: (op: TransformOp) => void
+}) {
+  return (
+    <button
+      onClick={() => onClick(op)}
+      disabled={!enabled}
+      title={{ rotateCW: '90° 時計回り', rotateCCW: '90° 反時計回り', mirrorH: '水平反転', mirrorV: '垂直反転' }[op]}
+      className={`px-2 py-1 rounded text-xs ${enabled ? 'bg-teal-700 hover:bg-teal-600 text-white' : 'bg-gray-700 text-gray-500 cursor-not-allowed'}`}
+    >
+      {label}
+    </button>
   )
 }
 
