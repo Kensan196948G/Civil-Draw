@@ -1,7 +1,8 @@
 import { defineConfig, devices } from '@playwright/test'
 
 const perfPort = 5190
-const port = process.env.PERF_RUN ? perfPort : 5173
+const devPort = process.env.DEV_PORT ? parseInt(process.env.DEV_PORT) : 5173
+const port = process.env.PERF_RUN ? perfPort : devPort
 const baseURL = `http://localhost:${port}`
 
 export default defineConfig({
@@ -24,7 +25,8 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
-  projects: process.env.PERF_RUN
+  // USE_FIREFOX=1 allows local runs on Linux where Chromium headless-shell crashes (SIGTRAP on kernel 6.17+)
+  projects: process.env.PERF_RUN || process.env.USE_FIREFOX
     ? [{ name: 'firefox', use: { ...devices['Desktop Firefox'] } }]
     : [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 })
