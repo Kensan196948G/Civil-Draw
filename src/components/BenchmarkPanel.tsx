@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useLayerStore } from '../store/layerStore'
 import { generatePerfShapes, generatePerfLayers } from '../utils/perfHarness'
 
@@ -10,20 +10,23 @@ export function BenchmarkPanel() {
   const loadDocument = useLayerStore((s) => s.loadDocument)
   const shapeCount = useLayerStore((s) => s.shapes.length)
 
-  const runLoad = (count: number) => {
-    const layers = generatePerfLayers()
-    const start = performance.now()
-    const shapes = generatePerfShapes({
-      count,
-      layerId: layers[0].id,
-      area: { width: 5000, height: 5000 },
-      seed: 42,
-    })
-    loadDocument(layers, shapes)
-    const ms = performance.now() - start
-    setLastLoad({ count, ms })
-    console.log(`[Benchmark] Generated ${count} shapes in ${ms.toFixed(1)}ms`)
-  }
+  const runLoad = useCallback(
+    (count: number) => {
+      const layers = generatePerfLayers()
+      const start = performance.now()
+      const shapes = generatePerfShapes({
+        count,
+        layerId: layers[0].id,
+        area: { width: 5000, height: 5000 },
+        seed: 42,
+      })
+      loadDocument(layers, shapes)
+      const ms = performance.now() - start
+      setLastLoad({ count, ms })
+      console.log(`[Benchmark] Generated ${count} shapes in ${ms.toFixed(1)}ms`)
+    },
+    [loadDocument],
+  )
 
   if (!open) {
     return (

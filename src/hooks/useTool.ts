@@ -265,7 +265,7 @@ export function useTool(stageToWorld: (x: number, y: number) => Point) {
   }, [activeTool, setSelectionBox, setDragOrigin])
 
   const handleDoubleClick = useCallback(
-    (_e: KonvaEventObject<MouseEvent>) => {
+    () => {
       if (activeTool === 'polyline' && isDrawing && drawPoints.length >= 4) {
         const shape: Shape = {
           id: nanoid(), type: 'polyline', layerId: activeLayerId, locked: false,

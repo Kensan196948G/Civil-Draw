@@ -6,10 +6,11 @@ export function FPSMeter() {
   const [fps, setFps] = useState(0)
   const [minFps, setMinFps] = useState(0)
   const samples = useRef<number[]>([])
-  const last = useRef(performance.now())
+  const last = useRef<number>(0)
   const raf = useRef<number>(0)
 
   useEffect(() => {
+    last.current = performance.now()
     const tick = () => {
       const now = performance.now()
       const delta = now - last.current

@@ -60,6 +60,7 @@ describe('runMicroBenchmark', () => {
     const result = await runMicroBenchmark(() => {
       let x = 0
       for (let i = 0; i < 10; i++) x += i
+      return x
     }, 20)
     expect(result.count).toBe(20)
     expect(result.elapsedMs).toBeGreaterThanOrEqual(0)
