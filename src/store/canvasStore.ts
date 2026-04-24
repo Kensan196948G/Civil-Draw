@@ -38,6 +38,7 @@ interface CanvasState {
   snapIntersection: boolean
   cursorX: number
   cursorY: number
+  exportFn: ((pixelRatio?: number) => string) | null
   setZoom: (zoom: number) => void
   setPan: (x: number, y: number) => void
   setScale: (scale: Scale) => void
@@ -50,6 +51,7 @@ interface CanvasState {
   setSnapIntersection: (v: boolean) => void
   setCursor: (x: number, y: number) => void
   resetView: () => void
+  registerExportFn: (fn: (pixelRatio?: number) => string) => void
 }
 
 export const useCanvasStore = create<CanvasState>()((set) => ({
@@ -66,6 +68,7 @@ export const useCanvasStore = create<CanvasState>()((set) => ({
   snapIntersection: true,
   cursorX: 0,
   cursorY: 0,
+  exportFn: null,
   setZoom: (zoom) => set({ zoom: Math.min(50, Math.max(0.1, zoom)) }),
   setPan: (panX, panY) => set({ panX, panY }),
   setScale: (scale) => set({ scale }),
@@ -78,4 +81,5 @@ export const useCanvasStore = create<CanvasState>()((set) => ({
   setSnapIntersection: (snapIntersection) => set({ snapIntersection }),
   setCursor: (cursorX, cursorY) => set({ cursorX, cursorY }),
   resetView: () => set({ zoom: 1, panX: 0, panY: 0 }),
+  registerExportFn: (fn) => set({ exportFn: fn }),
 }))

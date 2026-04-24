@@ -16,6 +16,7 @@ export function Toolbar() {
     snapMidpoint, setSnapMidpoint,
     snapIntersection, setSnapIntersection,
     resetView,
+    exportFn,
   } = useCanvasStore()
   const { layers, shapes, selectedIds, clearDocument, loadDocument, transformSelectedShapes } = useLayerStore()
   const hasSelection = selectedIds.length > 0
@@ -55,6 +56,44 @@ export function Toolbar() {
 
   const handleDxfImport = () => dxfInputRef.current?.click()
 
+  const handlePrint = () => {
+    const dataUrl = exportFn ? exportFn(3) : ''
+    if (!dataUrl) { window.print(); return }
+    const win = window.open('', '_blank')
+    if (!win) { window.print(); return }
+
+    const style = win.document.createElement('style')
+    style.textContent = [
+      '* { margin: 0; padding: 0; box-sizing: border-box; }',
+      'body { background: #fff; font-family: sans-serif; }',
+      'img { width: 100%; height: auto; display: block; }',
+      '#ctrl { position: fixed; top: 8px; right: 8px; display: flex; gap: 8px; }',
+      '#ctrl button { padding: 4px 12px; cursor: pointer; }',
+      '@media print { #ctrl { display: none; } @page { margin: 0; } }',
+    ].join(' ')
+
+    const img = win.document.createElement('img')
+    img.src = dataUrl
+
+    const ctrl = win.document.createElement('div')
+    ctrl.id = 'ctrl'
+
+    const printBtn = win.document.createElement('button')
+    printBtn.textContent = '印刷'
+    printBtn.addEventListener('click', () => win.print())
+
+    const closeBtn = win.document.createElement('button')
+    closeBtn.textContent = '閉じる'
+    closeBtn.addEventListener('click', () => win.close())
+
+    ctrl.appendChild(printBtn)
+    ctrl.appendChild(closeBtn)
+
+    win.document.head.appendChild(style)
+    win.document.body.appendChild(img)
+    win.document.body.appendChild(ctrl)
+  }
+
   const handleDxfFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -85,7 +124,7 @@ export function Toolbar() {
       <button onClick={handleSave} className="px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded">保存</button>
       <button onClick={handleDxfImport} className="px-2 py-1 bg-indigo-700 hover:bg-indigo-600 rounded">DXF読込</button>
       <button onClick={handleDxf} className="px-2 py-1 bg-blue-700 hover:bg-blue-600 rounded">DXF出力</button>
-      <button onClick={() => window.print()} className="px-2 py-1 bg-purple-700 hover:bg-purple-600 rounded">PDF出力</button>
+      <button onClick={handlePrint} className="px-2 py-1 bg-purple-700 hover:bg-purple-600 rounded">PDF出力</button>
       <input ref={fileInputRef} type="file" accept=".civil,.json" className="hidden" onChange={handleFileChange} />
       <input ref={dxfInputRef} type="file" accept=".dxf" className="hidden" onChange={handleDxfFileChange} />
 

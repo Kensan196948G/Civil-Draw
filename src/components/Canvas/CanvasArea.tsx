@@ -27,6 +27,7 @@ export function CanvasArea() {
   const gridVisible = useCanvasStore((s) => s.gridVisible)
   const scale = useCanvasStore((s) => s.scale)
   const setPan = useCanvasStore((s) => s.setPan)
+  const registerExportFn = useCanvasStore((s) => s.registerExportFn)
 
   const layers = useLayerStore((s) => s.layers)
   const shapes = useLayerStore((s) => s.shapes)
@@ -70,6 +71,13 @@ export function CanvasArea() {
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
+
+  // Register high-DPI export function so Toolbar can trigger canvas capture
+  useEffect(() => {
+    registerExportFn((pixelRatio = 3) => {
+      return stageRef.current?.toDataURL({ pixelRatio }) ?? ''
+    })
+  }, [registerExportFn])
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
