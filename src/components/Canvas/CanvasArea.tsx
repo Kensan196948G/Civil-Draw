@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback, useMemo, useState } from 'react'
+import { nanoid } from 'nanoid'
 import { Stage, Layer, Rect } from 'react-konva'
 import { useCanvasStore } from '../../store/canvasStore'
 import { useLayerStore } from '../../store/layerStore'
@@ -10,6 +11,7 @@ import { ShapeRenderer } from './ShapeRenderer'
 import { SnapMarker } from './SnapMarker'
 import { rectFromPoints } from '../../utils/selection'
 import { isInViewport, shouldCull } from '../../utils/viewportCulling'
+import type { Shape } from '../../types/geometry'
 import type Konva from 'konva'
 
 const GRID_UNIT = 1000
@@ -51,6 +53,7 @@ export function CanvasArea() {
   } = useTool(stageToWorld)
 
   const activeTool = useToolStore((s) => s.activeTool)
+  const pendingCoord = useToolStore((s) => s.pendingCoord)
 
   const isSpacePanning = useRef(false)
   const lastPanPos = useRef({ x: 0, y: 0 })
@@ -103,6 +106,94 @@ export function CanvasArea() {
       zoom, panX, panY,
     })
   }, [zoom, panX, panY, gridVisible, scale])
+
+  // Inject keyboard-entered coordinates into the drawing pipeline
+  useEffect(() => {
+    if (!pendingCoord) return
+    const p = pendingCoord
+    const ts = useToolStore.getState()
+    const ls = useLayerStore.getState()
+    const { activeTool, isDrawing, drawPoints, setIsDrawing, setDrawPoints, resetDrawing, setPendingCoord } = ts
+    const { activeLayerId, addShape } = ls
+
+    const finish = () => setPendingCoord(null)
+
+    if (activeTool === 'line') {
+      if (!isDrawing) {
+        setIsDrawing(true)
+        setDrawPoints([p.x, p.y])
+      } else {
+        const [x1, y1] = drawPoints
+        addShape({ id: nanoid(), type: 'line', layerId: activeLayerId, locked: false, x1, y1, x2: p.x, y2: p.y } as Shape)
+        resetDrawing()
+      }
+      finish()
+      return
+    }
+    if (activeTool === 'rect') {
+      if (!isDrawing) {
+        setIsDrawing(true)
+        setDrawPoints([p.x, p.y])
+      } else {
+        const [x1, y1] = drawPoints
+        addShape({ id: nanoid(), type: 'rect', layerId: activeLayerId, locked: false, x: Math.min(x1, p.x), y: Math.min(y1, p.y), width: Math.abs(p.x - x1), height: Math.abs(p.y - y1), rotation: 0 } as Shape)
+        resetDrawing()
+      }
+      finish()
+      return
+    }
+    if (activeTool === 'circle') {
+      if (!isDrawing) {
+        setIsDrawing(true)
+        setDrawPoints([p.x, p.y])
+      } else {
+        const [cx, cy] = drawPoints
+        addShape({ id: nanoid(), type: 'circle', layerId: activeLayerId, locked: false, cx, cy, radius: Math.hypot(p.x - cx, p.y - cy) } as Shape)
+        resetDrawing()
+      }
+      finish()
+      return
+    }
+    if (activeTool === 'polyline' || activeTool === 'hatch') {
+      if (!isDrawing) {
+        setIsDrawing(true)
+        setDrawPoints([p.x, p.y])
+      } else {
+        setDrawPoints([...drawPoints, p.x, p.y])
+      }
+      finish()
+      return
+    }
+    if (activeTool === 'text') {
+      const text = window.prompt('テキストを入力してください', '')
+      if (text != null) {
+        addShape({ id: nanoid(), type: 'text', layerId: activeLayerId, locked: false, x: p.x, y: p.y, text, fontSize: 14, rotation: 0 } as Shape)
+      }
+      finish()
+      return
+    }
+    if (activeTool === 'symbol') {
+      const symbolId = ts.selectedSymbolId ?? 'cone'
+      addShape({ id: nanoid(), type: 'symbol', layerId: activeLayerId, locked: false, symbolId, x: p.x, y: p.y, rotation: 0, scale: 1 } as Shape)
+      finish()
+      return
+    }
+    if (activeTool === 'dimension') {
+      if (!isDrawing) {
+        setIsDrawing(true)
+        setDrawPoints([p.x, p.y])
+      } else {
+        const [x1, y1] = drawPoints
+        const dx = Math.abs(p.x - x1)
+        const dy = Math.abs(p.y - y1)
+        addShape({ id: nanoid(), type: 'dimension', layerId: activeLayerId, locked: false, x1, y1, x2: p.x, y2: p.y, orientation: dx >= dy ? 'horizontal' : 'vertical', offset: 30, textHeight: 12, arrowSize: 8 } as Shape)
+        resetDrawing()
+      }
+      finish()
+      return
+    }
+    finish()
+  }, [pendingCoord])
 
   const handleStageMouseMove = useCallback(
     (e: Parameters<typeof handleCanvasMouseMove>[0]) => {

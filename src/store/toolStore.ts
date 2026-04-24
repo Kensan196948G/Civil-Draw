@@ -17,6 +17,7 @@ interface ToolState {
   hatchSpacing: number
   hatchAngle: number
   selectedSymbolId: string | null
+  pendingCoord: Point | null
   setActiveTool: (tool: ToolType) => void
   setPreviewShape: (shape: Shape | null) => void
   setIsDrawing: (v: boolean) => void
@@ -27,6 +28,7 @@ interface ToolState {
   setHatchSpacing: (s: number) => void
   setHatchAngle: (a: number) => void
   setSelectedSymbolId: (id: string | null) => void
+  setPendingCoord: (p: Point | null) => void
   resetDrawing: () => void
 }
 
@@ -41,6 +43,7 @@ export const useToolStore = create<ToolState>()((set) => ({
   hatchSpacing: 20,
   hatchAngle: 45,
   selectedSymbolId: 'cone',
+  pendingCoord: null,
   setActiveTool: (activeTool) =>
     set({
       activeTool,
@@ -49,6 +52,7 @@ export const useToolStore = create<ToolState>()((set) => ({
       drawPoints: [],
       selectionBox: null,
       dragOrigin: null,
+      pendingCoord: null,
     }),
   setPreviewShape: (previewShape) => set({ previewShape }),
   setIsDrawing: (isDrawing) => set({ isDrawing }),
@@ -59,6 +63,7 @@ export const useToolStore = create<ToolState>()((set) => ({
   setHatchSpacing: (hatchSpacing) => set({ hatchSpacing }),
   setHatchAngle: (hatchAngle) => set({ hatchAngle }),
   setSelectedSymbolId: (selectedSymbolId) => set({ selectedSymbolId }),
+  setPendingCoord: (pendingCoord) => set({ pendingCoord }),
   resetDrawing: () =>
     set({
       previewShape: null,
@@ -66,5 +71,6 @@ export const useToolStore = create<ToolState>()((set) => ({
       drawPoints: [],
       selectionBox: null,
       dragOrigin: null,
+      pendingCoord: null,
     }),
 }))
